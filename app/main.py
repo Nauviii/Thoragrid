@@ -10,7 +10,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app import api_client
 from app.theme import inject_css
 
-st.set_page_config(page_title="MedAssist", page_icon="◫", layout="wide")
+st.set_page_config(
+    page_title="MedAssist", page_icon="◫", layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 
 def _login_screen() -> None:

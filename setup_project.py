@@ -99,7 +99,6 @@ def create_project():
         "app/main.py",
 
         "app/pages/__init__.py",
-        "app/pages/login.py",
         "app/pages/text_qa.py",
         "app/pages/image_analysis.py",
         "app/pages/history.py",
@@ -107,8 +106,6 @@ def create_project():
 
         "app/components/__init__.py",
         "app/components/confidence_chart.py",
-        "app/components/gradcam_viewer.py",
-        "app/components/feedback_form.py",
 
         # scripts
         "scripts/db_models.py",

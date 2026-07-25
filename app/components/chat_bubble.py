@@ -2,8 +2,9 @@
 
 import streamlit as st
 
-from app.theme import condition_badge, TEXT_MUTED
+from app.theme import condition_badge, image_canvas, TEXT_MUTED
 from app.components.zone_grid import zone_grid_svg
+from app.components.confidence_chart import confidence_chart_html
 
 
 def render_user_text(question: str) -> None:
@@ -43,6 +44,11 @@ def render_analysis(result: dict) -> None:
                 "conditions, or below threshold, would also appear this way.</div>",
                 unsafe_allow_html=True,
             )
+            with st.expander("All 14 condition scores"):
+                st.markdown(
+                    confidence_chart_html(result["all_scores"], result["above_threshold"]),
+                    unsafe_allow_html=True,
+                )
             _render_latency(result)
             return
 
@@ -51,6 +57,8 @@ def render_analysis(result: dict) -> None:
             condition_badge(c, scores.get(c)) for c in result["above_threshold"]
         )
         st.markdown(badges, unsafe_allow_html=True)
+        with st.expander("All 14 condition scores"):
+            st.markdown(confidence_chart_html(scores, result["above_threshold"]), unsafe_allow_html=True)
         st.markdown(f'<hr class="ma-divider">', unsafe_allow_html=True)
 
         findings_by_condition = {f["condition"]: f for f in result["gradcam_findings"]}
@@ -63,9 +71,7 @@ def render_analysis(result: dict) -> None:
 
             with col_image:
                 if finding:
-                    st.markdown('<div class="ma-canvas">', unsafe_allow_html=True)
-                    st.image(finding["heatmap_url"], use_container_width=True)
-                    st.markdown("</div>", unsafe_allow_html=True)
+                    st.markdown(image_canvas(finding["heatmap_url"]), unsafe_allow_html=True)
 
             with col_text:
                 st.markdown(condition_badge(name, scores.get(name)), unsafe_allow_html=True)

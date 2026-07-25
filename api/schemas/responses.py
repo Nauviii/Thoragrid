@@ -74,6 +74,14 @@ class HistoryResponse(BaseModel):
     total: int
 
 
+class ConversationImageFindingOut(BaseModel):
+    """One condition's GradCAM heatmap within a transcript turn; heatmap_url is None if re-signing failed."""
+    condition: str
+    heatmap_url: str | None
+    dominant_zones: list[str]
+    aligned: bool
+
+
 class ConversationTurnOut(BaseModel):
     """One turn in a conversation transcript."""
     interaction_id: str
@@ -83,6 +91,8 @@ class ConversationTurnOut(BaseModel):
     answer: str | None = None
     above_threshold: list[str] | None = None
     clinical_summary: str | None = None
+    xray_url: str | None = None
+    gradcam_findings: list[ConversationImageFindingOut] | None = None
 
 
 class ConversationTranscriptResponse(BaseModel):

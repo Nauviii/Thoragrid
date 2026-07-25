@@ -60,8 +60,16 @@ def test_get_conversation_returns_full_transcript(client, doctor, cleanup_conver
     body = r.json()
     assert body["conversation_id"] == conv_id
     assert len(body["turns"]) == 2
-    assert body["turns"][0]["interaction_type"] == "image"
-    assert body["turns"][1]["interaction_type"] == "text"
+    image_turn, text_turn = body["turns"]
+    assert image_turn["interaction_type"] == "image"
+    assert text_turn["interaction_type"] == "text"
+
+    # Image turn carries a freshly re-signed xray URL and one heatmap per above-threshold condition,
+    # regardless of how long ago the case was analyzed (see core/storage/supabase_storage.py).
+    assert image_turn["xray_url"] is not None and image_turn["xray_url"].startswith("http")
+    assert len(image_turn["gradcam_findings"]) == len(image_body["above_threshold"])
+    for finding in image_turn["gradcam_findings"]:
+        assert finding["heatmap_url"] is not None and finding["heatmap_url"].startswith("http")  
 
 
 def test_conversation_ownership_enforced(client, doctor, second_doctor, cleanup_conversation):

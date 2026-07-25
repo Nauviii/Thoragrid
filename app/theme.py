@@ -63,8 +63,13 @@ html, body, [class*="css"] {{
 /* Tighten Streamlit's default vertical padding — the stock spacing reads as "demo app" */
 .block-container {{ padding-top: 2.2rem; padding-bottom: 6rem; max-width: 62rem; }}
 
-h1, h2, h3 {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }}
-h1 {{ font-size: 1.75rem; }}
+/* Scoped to the markdown container: a bare `h1` selector loses to Streamlit's own rule. */
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3 {{
+    font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; letter-spacing: -0.01em;
+}}
+[data-testid="stMarkdownContainer"] h1 {{ font-size: 1.75rem; }}
 
 /* App header: hairline rule, not a heavy bar */
 .ma-header {{
@@ -126,7 +131,13 @@ h1 {{ font-size: 1.75rem; }}
 [data-testid="stSidebar"] {{ background: var(--ma-surface); border-right: 1px solid var(--ma-border); }}
 [data-testid="stSidebar"] .block-container {{ padding-top: 1.5rem; }}
 
-#MainMenu, footer, header {{ visibility: hidden; }}
+/* Hide the hamburger menu and footer, but never the whole header: it hosts both the
+   sidebar expand control and st.navigation(position="top"). Hiding it stranded users
+   with a collapsed sidebar and no visible way back to History/Analytics. */
+#MainMenu, footer {{ visibility: hidden; }}
+[data-testid="stDecoration"] {{ display: none; }}
+[data-testid="stToolbar"] {{ visibility: hidden; }}
+[data-testid="stHeader"] {{ background: transparent; }}
 
 .stDataFrame {{ border: 1px solid var(--ma-border); border-radius: 8px; }}
 </style>
@@ -137,6 +148,20 @@ def inject_css() -> None:
     """Inject the app's custom CSS; call once per page render."""
     import streamlit as st
     st.markdown(_CSS, unsafe_allow_html=True)
+
+
+def image_canvas(url: str, max_width: str | None = None) -> str:
+    """Return HTML for one image on the dark X-ray canvas, wrapper and img in a single block.
+
+    Streamlit isolates each st.markdown call, so an opening <div> emitted on its own is
+    auto-closed and renders as an empty dark box above an unwrapped st.image. Emitting
+    both together is the only way the canvas actually wraps the image.
+    """
+    wrapper_style = f' style="max-width:{max_width}"' if max_width else ""
+    return (
+        f'<div class="ma-canvas"{wrapper_style}><img src="{url}" '
+        f'style="width:100%;display:block;border-radius:6px"></div>'
+    )
 
 
 def condition_badge(condition: str, score: float | None = None) -> str:
