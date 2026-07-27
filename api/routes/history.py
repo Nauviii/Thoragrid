@@ -36,6 +36,7 @@ def get_history(
             raw_query=i.raw_query,
             above_threshold=i.cnn_result.above_threshold if i.cnn_result else None,
             latency_ms=i.latency_ms,
+            feedback=i.feedback.is_correct if i.feedback else None,
         )
         for i in interactions
     ]

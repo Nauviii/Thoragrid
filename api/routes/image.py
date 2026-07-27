@@ -56,7 +56,12 @@ def analyze_xray(
 
     validation = clip_validate(image)
     if not validation.is_valid:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, validation.reason)
+        # Structured detail: the UI renders reason-specific guidance from `code`, while
+        # `reason` keeps the scores for logs and support without being shown to clinicians.
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"code": validation.code, "reason": validation.reason},
+        )
 
     inference_out = run_inference(image, model)
 
@@ -164,6 +169,7 @@ def analyze_xray(
     return ImageAnalysisResponse(
         interaction_id=interaction.id,
         conversation_id=resolved_conversation_id,
+        xray_url=xray_url,
         all_scores=inference_out["all_scores"],
         above_threshold=inference_out["above_threshold"],
         low_confidence_flag=inference_out["low_confidence_flag"],

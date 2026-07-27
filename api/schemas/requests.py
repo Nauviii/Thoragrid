@@ -18,3 +18,7 @@ class FeedbackRequest(BaseModel):
 class SqlAgentRequest(BaseModel):
     """Request body for POST /agent/query — a natural language analytics question."""
     question: str
+
+class ResumeSessionRequest(BaseModel):
+    """Request body for POST /auth/resume — an opaque browser session key."""
+    session_key: str

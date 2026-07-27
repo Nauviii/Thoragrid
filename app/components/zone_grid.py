@@ -2,8 +2,15 @@
 
 Coordinates mirror CHEST_REGIONS in core/gradcam/region_map.py exactly, so the schematic
 shows the same zone boundaries the backend actually measured activation against — this is
-a readout of real data, not a decorative approximation.
+a readout of real data, not a decorative approximation. The same figure, abstracted, is the
+product's mark; see theme.brand_mark.
+
+Every zone is labelled, not only the dominant ones. An unlabelled grid asks the reader to
+remember which cell is which, and the labels are what make it legible as anatomy rather
+than as decoration — the inactive ones simply recede.
 """
+
+from app.theme import SIGNAL, TEXT_MUTED
 
 # Normalized (x1, y1, x2, y2), matching core/gradcam/region_map.py CHEST_REGIONS
 _ZONES: dict[str, tuple[float, float, float, float]] = {
@@ -16,19 +23,26 @@ _ZONES: dict[str, tuple[float, float, float, float]] = {
     "LLZ": (0.50, 0.63, 1.00, 1.00),
 }
 
-_STROKE = "#C6CDD4"
-_STROKE_ACTIVE = "#2B4C5C"
-_FILL_ACTIVE = "#2B4C5C1F"
-_LABEL = "#8A94A0"
+# Strong enough to read as a diagram on the film surface. The previous hairline sat at the
+# threshold of visibility and the whole figure looked unfinished because of it.
+_STROKE_IDLE = "#B7C2CE"
+_LABEL_IDLE = "#93A0AE"
+_FILL_ACTIVE = f"{SIGNAL}26"
 
 
-def zone_grid_svg(dominant_zones: list[str], width: int = 92, height: int = 116) -> str:
-    """Return an SVG schematic of the 7 chest zones with the dominant ones highlighted."""
+def zone_grid_svg(dominant_zones: list[str], max_width: int = 104) -> str:
+    """Return an SVG schematic of the 7 chest zones with the dominant ones highlighted.
+
+    Sized by viewBox rather than fixed pixels so the figure shrinks with its column instead
+    of forcing the column to stay wide enough for it.
+    """
     active = set(dominant_zones or [])
+    label = ", ".join(sorted(active)) or "none dominant"
     parts = [
-        f'<svg width="{width}" height="{height}" viewBox="0 0 100 126" '
+        f'<svg viewBox="0 0 100 126" preserveAspectRatio="xMidYMid meet" '
+        f'style="width:100%;height:auto;max-width:{max_width}px" '
         f'xmlns="http://www.w3.org/2000/svg" role="img" '
-        f'aria-label="Chest zones: {", ".join(sorted(active)) or "none dominant"}">'
+        f'aria-label="Chest zones, dominant: {label}">'
     ]
 
     for zone, (x1, y1, x2, y2) in _ZONES.items():
@@ -38,15 +52,24 @@ def zone_grid_svg(dominant_zones: list[str], width: int = 92, height: int = 116)
         parts.append(
             f'<rect x="{px:.1f}" y="{py:.1f}" width="{w:.1f}" height="{h:.1f}" '
             f'fill="{_FILL_ACTIVE if is_active else "none"}" '
-            f'stroke="{_STROKE_ACTIVE if is_active else _STROKE}" '
-            f'stroke-width="{1.2 if is_active else 0.7}" rx="1.5" />'
+            f'stroke="{SIGNAL if is_active else _STROKE_IDLE}" '
+            f'stroke-width="{1.7 if is_active else 1.0}" rx="2.5" />'
         )
-        if is_active:
-            parts.append(
-                f'<text x="{px + w / 2:.1f}" y="{py + h / 2 + 2.5:.1f}" '
-                f'text-anchor="middle" font-family="IBM Plex Mono, monospace" '
-                f'font-size="7" fill="{_STROKE_ACTIVE}">{zone}</text>'
-            )
+        parts.append(
+            f'<text x="{px + w / 2:.1f}" y="{py + h / 2 + 2.6:.1f}" text-anchor="middle" '
+            f'font-family="JetBrains Mono, monospace" font-size="7.5" letter-spacing="0.3" '
+            f'font-weight="{500 if is_active else 400}" '
+            f'fill="{SIGNAL if is_active else _LABEL_IDLE}">{zone}</text>'
+        )
 
     parts.append("</svg>")
     return "".join(parts)
+
+
+def zone_panel(dominant_zones: list[str]) -> str:
+    """Return the schematic mounted on its panel, with the dominant zones named beneath it."""
+    named = ", ".join(dominant_zones) if dominant_zones else "none"
+    return (
+        f'<div class="ma-zonecard">{zone_grid_svg(dominant_zones)}</div>'
+        f'<span class="ma-mount-label">dominant · {named}</span>'
+    )

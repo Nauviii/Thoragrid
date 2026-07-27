@@ -34,6 +34,7 @@ class ValidationResult:
     is_valid:       bool
     layer1_passed:  bool
     layer2_passed:  bool
+    code:           str     # machine-readable: valid | not_a_chest_xray | outside_training_distribution
     reason:         str
     valid_score:    float   # mean cosine sim vs valid prompts
     invalid_score:  float   # mean cosine sim vs invalid prompts
@@ -144,22 +145,26 @@ def validate(image: Image.Image) -> ValidationResult:
     is_valid = layer1_passed and layer2_passed
 
     if not layer1_passed:
+        code = "not_a_chest_xray"
         reason = (
             f"Image does not resemble a chest X-ray "
             f"(valid_score={valid_score:.3f}, invalid_score={invalid_score:.3f})"
         )
     elif not layer2_passed:
+        code = "outside_training_distribution"
         reason = (
             f"Image distribution inconsistent with NIH ChestX-ray14 "
             f"(distance={distance:.3f}, threshold={threshold:.3f})"
         )
     else:
+        code = "valid"
         reason = "Valid chest X-ray"
 
     return ValidationResult(
         is_valid = is_valid,
         layer1_passed = layer1_passed,
         layer2_passed = layer2_passed,
+        code = code,
         reason = reason,
         valid_score = round(valid_score, 4),
         invalid_score = round(invalid_score, 4),

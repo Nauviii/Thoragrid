@@ -35,6 +35,8 @@ pwdlib[argon2]>=0.2.0
 
 # Frontend
 streamlit>=1.36.0
+extra-streamlit-components>=0.1.71
+altair>=5.0
 plotly>=5.22.0
 
 # Data / Utils

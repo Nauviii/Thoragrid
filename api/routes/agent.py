@@ -35,6 +35,7 @@ def agent_query(
 
     return SqlAgentResponse(
         sql_executed=result["sql_executed"],
+        answer=result["answer"],
         explanation=result["explanation"],
         rows=result["rows"],
         row_count=result["row_count"],

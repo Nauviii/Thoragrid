@@ -30,7 +30,11 @@ v_image_findings (one row per detected condition per chest X-ray analysis):
   aligned                boolean  -- whether GradCAM activation matched the expected clinical zone
   low_confidence_flag    boolean  -- true when no condition passed threshold for that image
   is_correct             boolean, nullable  -- doctor feedback: agree/disagree/no feedback yet
-  feedback_comment       text, nullable
+  feedback_comment       text, nullable  -- reason code when is_correct is false; one of
+                                      missed_finding, false_positive, wrong_location,
+                                      wrong_severity, other. 'other' may carry a free-text
+                                      note after a colon, so match it with LIKE 'other%'.
+                                      Null whenever is_correct is true or unset.
 
 v_text_interactions (one row per free-text clinical question asked):
   interaction_id         text
@@ -39,13 +43,16 @@ v_text_interactions (one row per free-text clinical question asked):
   interaction_timestamp  timestamptz
   latency_ms             integer
   is_correct             boolean, nullable
-  feedback_comment       text, nullable
+  feedback_comment       text, nullable  -- same reason codes as v_image_findings
 
 Rules:
 - Output exactly one SELECT statement — no other statement types, no semicolon stacking
 - Never reference any table other than the two above; nothing else exists for you
 - Use standard PostgreSQL syntax
 - Do not add a doctor_id filter yourself — access scoping is applied automatically after generation
+- When the question asks which value is most/least frequent, or highest/lowest, include the
+  aggregate itself as an output column (e.g. COUNT(*) AS case_count) — not just the label,
+  since the answer is reported back to a clinician who needs the number
 - If the question cannot be answered with these two views, explain why in "explanation" and set
   "sql" to "SELECT 1 WHERE false"
 - Write "explanation" in the same language as the question (Indonesian or English)
@@ -62,6 +69,47 @@ SQL_AGENT_SCHEMA = {
     "required": ["sql", "explanation"],
     "additionalProperties": False,
 }
+
+
+SQL_ANSWER_SYSTEM = """You are a hospital analytics assistant. Answer the clinician's question \
+using result rows that have already been retrieved from the database.
+
+Rules:
+- State the actual figures present in the rows; never invent a number that is not there
+- If the rows are empty, say plainly that no matching records were found
+- Two or three sentences at most, no preamble, do not restate the question
+- Never mention SQL, queries, tables, columns, views, or databases — the reader is a
+  clinician reading a result, not an engineer reading a query
+- Write in the same language as the question (Indonesian or English)
+
+Output ONLY valid JSON with this exact schema:
+{"answer": "<your answer>"}"""
+
+SQL_ANSWER_SCHEMA = {
+    "type": "object",
+    "properties": {"answer": {"type": "string"}},
+    "required": ["answer"],
+    "additionalProperties": False,
+}
+
+# Cap rows sent to the summarizer: a 500-row result would blow the context for no gain,
+# since the answer only needs the shape and the leading figures.
+_MAX_ROWS_FOR_SUMMARY = 20
+
+
+def _summarize_result(question: str, rows: list[dict]) -> str:
+    """Turn executed result rows into a plain-language answer for a clinician."""
+    preview = rows[:_MAX_ROWS_FOR_SUMMARY]
+    user_prompt = (
+        f"Question: {question}\n\n"
+        f"Result rows ({len(rows)} total, showing {len(preview)}):\n"
+        f"{json.dumps(preview, default=str)}"
+    )
+    raw = call_groq(
+        SQL_ANSWER_SYSTEM, user_prompt,
+        schema=SQL_ANSWER_SCHEMA, schema_name="sql_answer",
+    )
+    return json.loads(raw)["answer"]
 
 
 def _build_retry_prompt(question: str, failed_sql: str, error: str) -> str:
@@ -95,8 +143,14 @@ def run_sql_agent(
         try:
             safe_sql = validate_and_scope_sql(parsed["sql"], role, doctor_id, max_rows)
             rows = execute_readonly_sql(safe_sql)
+            try:
+                answer = _summarize_result(question, rows)
+            except Exception:
+                # Summarization is presentation only; never fail a successful query over it.
+                answer = parsed["explanation"]
             return {
                 "sql_executed": safe_sql,
+                "answer": answer,
                 "explanation": parsed["explanation"],
                 "rows": rows,
                 "row_count": len(rows),
@@ -114,6 +168,7 @@ def run_sql_agent(
 
     return {
         "sql_executed": None,
+        "answer": "That question could not be answered from the available records.",
         "explanation": f"Query could not be executed safely: {last_error}",
         "rows": [],
         "row_count": 0,

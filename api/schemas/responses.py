@@ -6,9 +6,12 @@ from pydantic import BaseModel
 
 
 class TokenResponse(BaseModel):
-    """Response body for a successful login."""
+    """Response body for a successful login or a resumed browser session."""
     access_token: str
     token_type: str = "bearer"
+    role: str            # for UI gating only; every endpoint re-checks the role from the token
+    username: str
+    session_key: str     # opaque browser-session key; the JWT itself never leaves the server
 
 
 class GradCAMFindingOut(BaseModel):
@@ -30,6 +33,7 @@ class ImageAnalysisResponse(BaseModel):
     """Full response body for POST /analyze/xray."""
     interaction_id: str
     conversation_id: str
+    xray_url: str        # signed URL of the normalized upload, for side-by-side reading
     all_scores: dict[str, float]
     above_threshold: list[str]
     low_confidence_flag: bool
@@ -66,6 +70,7 @@ class HistoryItemOut(BaseModel):
     raw_query: str | None
     above_threshold: list[str] | None
     latency_ms: int | None
+    feedback: bool | None = None   # None = none given, True = agreed, False = disagreed
 
 
 class HistoryResponse(BaseModel):
@@ -109,7 +114,8 @@ class ConversationCloseResponse(BaseModel):
 class SqlAgentResponse(BaseModel):
     """Response body for POST /agent/query."""
     sql_executed: str | None
-    explanation: str
+    answer: str          # result-aware, clinician-facing; generated after execution
+    explanation: str     # pre-execution description of what the query does; audit detail
     rows: list[dict]
     row_count: int
     latency_ms: int

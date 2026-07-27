@@ -14,7 +14,19 @@ _TIMEOUT = 120  # image analysis runs CNN + GradCAM + 2 LLM calls; needs a gener
 
 
 class ApiError(Exception):
-    """Raised when the backend returns a non-2xx response."""
+    """Raised when the backend returns a non-2xx response.
+
+    Carries the parsed detail so callers can branch on a machine-readable `code` (e.g. an
+    image-validation rejection) instead of pattern-matching the message text. str(exc)
+    keeps the original "<status>: <message>" form so existing call sites are unaffected.
+    """
+
+    def __init__(self, status_code: int, detail: dict | str):
+        self.status_code = status_code
+        self.detail = detail
+        self.code = detail.get("code") if isinstance(detail, dict) else None
+        message = detail.get("reason", detail) if isinstance(detail, dict) else detail
+        super().__init__(f"{status_code}: {message}")
 
 
 def _auth_headers(token: str) -> dict:
@@ -30,17 +42,17 @@ def _handle(response: requests.Response) -> dict:
         detail = response.json().get("detail", response.text)
     except ValueError:
         detail = response.text
-    raise ApiError(f"{response.status_code}: {detail}")
+    raise ApiError(response.status_code, detail)
 
 
-def login(username: str, password: str) -> str:
-    """Authenticate and return a JWT access token."""
+def login(username: str, password: str) -> dict:
+    """Authenticate and return the token, role, username, and opaque browser session key."""
     response = requests.post(
         f"{BASE_URL}/auth/token",
         data={"username": username, "password": password},
         timeout=_TIMEOUT,
     )
-    return _handle(response)["access_token"]
+    return _session_from(_handle(response))
 
 
 def analyze_xray(token: str, file_bytes: bytes, filename: str, conversation_id: str | None = None) -> dict:
@@ -117,3 +129,27 @@ def agent_query(token: str, question: str) -> dict:
         timeout=_TIMEOUT,
     )
     return _handle(response)
+
+def resume_session(session_key: str) -> dict:
+    """Exchange a stored opaque session key for its token; raises ApiError if expired or revoked."""
+    response = requests.post(
+        f"{BASE_URL}/auth/resume", json={"session_key": session_key}, timeout=_TIMEOUT,
+    )
+    return _session_from(_handle(response))
+
+
+def end_browser_session(session_key: str) -> None:
+    """Revoke an opaque session key server-side so a stale cookie cannot resume it."""
+    requests.delete(
+        f"{BASE_URL}/auth/session", json={"session_key": session_key}, timeout=_TIMEOUT,
+    )
+
+
+def _session_from(body: dict) -> dict:
+    """Normalize an auth response into the shape the app stores in session state."""
+    return {
+        "token": body["access_token"],
+        "role": body["role"],
+        "username": body["username"],
+        "session_key": body["session_key"],
+    }
