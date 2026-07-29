@@ -1,4 +1,4 @@
-"""Design system for MedAssist: tokens, type, CSS, and the marks used across the app.
+"""Design system for Thoragrid: tokens, type, CSS, and the marks used across the app.
 
 Direction — "reading room". Radiologists read in a dimmed room against a bright film, so the
 app is built the same way: a deep ink shell holds navigation and identity, and the reading
@@ -57,14 +57,14 @@ def _svg_data_uri(svg: str) -> str:
 
 
 def brand_mark(size: int = 32) -> str:
-    """The MedAssist mark: a chest field divided into zones, one of them lit.
+    """The Thoragrid mark: a chest field divided into zones, one of them lit.
 
     Two divisions rather than the full seven — at 32px the complete schematic turns to mud,
-    and the meaning survives the abstraction.
+    and the meaning survives the abstraction. The name is literal: thorax, gridded.
     """
     return (
         f'<svg width="{size}" height="{size}" viewBox="0 0 32 32" fill="none" '
-        f'xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MedAssist">'
+        f'xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Thoragrid">'
         f'<rect width="32" height="32" rx="9" fill="{INK}"/>'
         f'<g stroke="{HALO}" stroke-opacity="0.4" stroke-width="1.25" '
         f'stroke-linecap="round" fill="none">'
@@ -80,7 +80,7 @@ def brand_lockup() -> str:
     """The mark paired with the wordmark, for the sidebar head and the sign-in screen."""
     return (
         f'<div class="ma-brand">{brand_mark(30)}'
-        f'<span class="ma-brand-word">MedAssist</span></div>'
+        f'<span class="ma-brand-word">Thoragrid</span></div>'
     )
 
 

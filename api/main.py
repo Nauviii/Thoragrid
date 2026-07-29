@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="MedAssist API", lifespan=lifespan)
+app = FastAPI(title="Thoragrid API", lifespan=lifespan)
 
 # Tighten allow_origins to the actual Streamlit origin before any real deployment.
 app.add_middleware(

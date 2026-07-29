@@ -1,4 +1,4 @@
-"""HTTP client for the MedAssist FastAPI backend.
+"""HTTP client for the Thoragrid FastAPI backend.
 
 All calls go through the same JWT the user obtained at login — the frontend never talks
 to Postgres, Pinecone, Groq, or Supabase directly. Role scoping, guardrails, and audit
@@ -53,6 +53,31 @@ def login(username: str, password: str) -> dict:
         timeout=_TIMEOUT,
     )
     return _session_from(_handle(response))
+
+
+def resume_session(session_key: str) -> dict:
+    """Exchange a stored opaque session key for its token; raises ApiError if expired or revoked."""
+    response = requests.post(
+        f"{BASE_URL}/auth/resume", json={"session_key": session_key}, timeout=_TIMEOUT,
+    )
+    return _session_from(_handle(response))
+
+
+def end_browser_session(session_key: str) -> None:
+    """Revoke an opaque session key server-side so a stale cookie cannot resume it."""
+    requests.delete(
+        f"{BASE_URL}/auth/session", json={"session_key": session_key}, timeout=_TIMEOUT,
+    )
+
+
+def _session_from(body: dict) -> dict:
+    """Normalize an auth response into the shape the app stores in session state."""
+    return {
+        "token": body["access_token"],
+        "role": body["role"],
+        "username": body["username"],
+        "session_key": body["session_key"],
+    }
 
 
 def analyze_xray(token: str, file_bytes: bytes, filename: str, conversation_id: str | None = None) -> dict:
@@ -129,27 +154,3 @@ def agent_query(token: str, question: str) -> dict:
         timeout=_TIMEOUT,
     )
     return _handle(response)
-
-def resume_session(session_key: str) -> dict:
-    """Exchange a stored opaque session key for its token; raises ApiError if expired or revoked."""
-    response = requests.post(
-        f"{BASE_URL}/auth/resume", json={"session_key": session_key}, timeout=_TIMEOUT,
-    )
-    return _session_from(_handle(response))
-
-
-def end_browser_session(session_key: str) -> None:
-    """Revoke an opaque session key server-side so a stale cookie cannot resume it."""
-    requests.delete(
-        f"{BASE_URL}/auth/session", json={"session_key": session_key}, timeout=_TIMEOUT,
-    )
-
-
-def _session_from(body: dict) -> dict:
-    """Normalize an auth response into the shape the app stores in session state."""
-    return {
-        "token": body["access_token"],
-        "role": body["role"],
-        "username": body["username"],
-        "session_key": body["session_key"],
-    }

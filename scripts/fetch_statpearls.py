@@ -11,7 +11,7 @@ RAW_DIR = Path("data/knowledge_base/raw/statpearls")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 HEADERS = {
-    "User-Agent": f"MedAssist-RAG/1.0 ({os.getenv('NCBI_EMAIL', 'noemail')})"
+    "User-Agent": f"Thoragrid-RAG/1.0 ({os.getenv('NCBI_EMAIL', 'noemail')})"
 }
 DELAY_SEC = 2.0  # NCBI allows max 3 req/s without API key; 2s is safe
 

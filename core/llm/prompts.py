@@ -181,7 +181,7 @@ def parse_llm2_output(text: str) -> dict:
 # and a clinician who is told the assistant measures something it does not measure has been
 # misled about the instrument, not merely given a vague answer. Everything below is checkable
 # against the code; nothing outside it may be claimed.
-SYSTEM_OVERVIEW = """MedAssist is a chest radiograph decision-support assistant for radiologists,
+SYSTEM_OVERVIEW = """Thoragrid is a chest radiograph decision-support assistant for radiologists,
 physicians and administrators. It reads a frontal chest X-ray, reports what it finds, shows where
 it looked, and lets the reader question the result. It supports a specialist's reading; it does
 not replace one and is not a diagnostic device.

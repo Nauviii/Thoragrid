@@ -1,4 +1,4 @@
-"""MedAssist entry point: the app shell, sign-in, session resume, and page routing.
+"""Thoragrid entry point: the app shell, sign-in, session resume, and page routing.
 
 The shell is a dark rail holding the mark, navigation, whatever the current page needs, and
 the signed-in reader. Streamlit's own navigation is suppressed (position="hidden") so the
@@ -16,13 +16,18 @@ from app import api_client
 from app.theme import inject_css, brand_lockup, brand_mark, zone_watermark
 
 st.set_page_config(
-    page_title="MedAssist", page_icon="◫", layout="wide",
+    page_title="Thoragrid", page_icon="◫", layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # Only the opaque key lives in the browser; the JWT stays server-side in Redis.
 _SESSION_COOKIE = "medassist_session"
 
+# Exactly one instance per script run, at module scope. It cannot be cached, because the
+# constructor issues a keyed widget command and Streamlit forbids those inside cached
+# functions. It cannot be stashed in session_state either: a widget that isn't re-rendered
+# on every run goes stale on the frontend. And it must not be constructed twice in one run,
+# or the two calls collide on the same widget key.
 _cookies = stx.CookieManager(key="medassist_cookie_manager")
 
 
@@ -31,6 +36,8 @@ def _forget_cookie(widget_key: str) -> None:
     try:
         _cookies.delete(_SESSION_COOKIE, key=widget_key)
     except KeyError:
+        # CookieManager.delete() also drops the name from its local dict, which raises if
+        # the cookie was never loaded in this run. The browser-side delete still went out.
         pass
 
 
@@ -77,7 +84,7 @@ def _sign_in_screen() -> None:
         st.markdown(
             '<div style="text-align:center">'
             '<div style="font-family:var(--serif);font-size:2.7rem;line-height:1.05;'
-            'letter-spacing:-0.015em">MedAssist</div>'
+            'letter-spacing:-0.015em">Thoragrid</div>'
             '<div class="ma-caption" style="margin-top:0.5rem">'
             "Chest radiograph decision support. Fourteen findings, localised and explained, "
             "for the specialist reading the study.</div></div>",
