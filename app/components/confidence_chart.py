@@ -1,17 +1,8 @@
-"""Score readouts for the 14 CNN conditions: the full meter list and the near-miss narrative.
-
-`above_threshold` alone hides the case a reader most needs to see — a 0.68 against a 0.70
-threshold looks identical to a 0.02. The meter shows every condition; colour is reserved for
-the ones that actually passed, so scanning the list still separates signal from noise.
-"""
+"""Score readouts for the 14 CNN conditions: the full meter list and the near-miss narrative."""
 
 from app.theme import CONDITION_COLORS, TEXT_MUTED
 
 _BELOW_THRESHOLD_COLOR = "#C3CCD6"  # neutral, deliberately not a condition hue
-
-# A top score this far clear of the runner-up means one condition genuinely led; below it,
-# the model spread its probability mass rather than favouring any single finding. The cut
-# is a presentation heuristic for wording only — it never gates what is displayed.
 _DOMINANCE_GAP = 0.15
 
 

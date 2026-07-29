@@ -1,9 +1,14 @@
-"""Retrieve relevant chunks from Pinecone for image and text Q&A paths."""
+"""Hybrid retrieval: dense embeddings and BM25, fused by reciprocal rank."""
 
-from sentence_transformers import SentenceTransformer
+from collections import defaultdict
+
 from pinecone import Index
+from sentence_transformers import SentenceTransformer
 
-_MODEL = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+from config.settings import settings
+from core.rag import bm25_index
+
+_MODEL = SentenceTransformer(settings.rag_embedding_model)
 
 
 def _adaptive_top_k(n_conditions: int) -> int:
@@ -15,31 +20,20 @@ def _adaptive_top_k(n_conditions: int) -> int:
     return 2
 
 
-def _query_index(
-    query: str,
-    index: Index,
-    top_k: int,
-    namespace: str,
-    score_threshold: float,
-    condition: str | None = None,
-) -> list[dict]:
-    """Embed query, run Pinecone query, filter by score threshold, return chunk dicts."""
+def _dense_search(
+    query: str, index: Index, top_n: int, namespace: str, condition: str | None,
+) -> list[tuple[str, dict]]:
+    """Return (chunk_id, chunk) pairs from Pinecone, ranked by cosine similarity."""
     vector = _MODEL.encode(query).tolist()
-    filter_expr = {"condition": {"$eq": condition}} if condition else None
-
     response = index.query(
         vector=vector,
-        top_k=top_k,
+        top_k=top_n,
         namespace=namespace,
-        filter=filter_expr,
+        filter={"condition": {"$eq": condition}} if condition else None,
         include_metadata=True,
     )
-
-    results = []
-    for match in response.matches:
-        if match.score < score_threshold:
-            continue
-        results.append({
+    return [
+        (match.id, {
             "chunk_id":  match.id,
             "condition": match.metadata.get("condition", ""),
             "section":   match.metadata.get("section", ""),
@@ -47,6 +41,48 @@ def _query_index(
             "text":      match.metadata.get("text", ""),
             "score":     round(match.score, 4),
         })
+        for match in response.matches
+    ]
+
+
+def _reciprocal_rank_fusion(rankings: list[list[str]], k: int) -> list[str]:
+    """Fuse ranked id lists into one ordering by summed reciprocal rank.
+
+    k damps the influence of the top positions. At the conventional 60 a first place is worth
+    1/61 and a tenth 1/70, so agreement across both retrievers outranks a single strong hit —
+    which is the property the fusion exists for.
+    """
+    totals: dict[str, float] = defaultdict(float)
+    for ranking in rankings:
+        for rank, chunk_id in enumerate(ranking, start=1):
+            totals[chunk_id] += 1.0 / (k + rank)
+    return sorted(totals, key=totals.get, reverse=True)
+
+
+def _hybrid_search(
+    query: str, index: Index, top_k: int, namespace: str, condition: str | None,
+) -> list[dict]:
+    """Run both retrievers, fuse by reciprocal rank, and return the top_k chunks."""
+    candidates = max(top_k * settings.rag_candidate_multiplier, top_k)
+
+    dense = _dense_search(query, index, candidates, namespace, condition)
+    dense_by_id = dict(dense)
+    dense_ids = [chunk_id for chunk_id, _ in dense]
+
+    if not bm25_index.is_available():
+        return [dense_by_id[i] for i in dense_ids[:top_k]]
+
+    lexical_ids = bm25_index.search(query, candidates, condition)
+    fused = _reciprocal_rank_fusion([dense_ids, lexical_ids], settings.rag_rrf_k)
+
+    results = []
+    for chunk_id in fused[:top_k]:
+        chunk = dense_by_id.get(chunk_id) or bm25_index.chunk_by_id(chunk_id)
+
+        if chunk:
+            chunk = dict(chunk)
+            chunk.setdefault("score", None)
+            results.append(chunk)
     return results
 
 
@@ -54,7 +90,6 @@ def retrieve_for_image_path(
     rag_queries: list[dict],
     index: Index,
     namespace: str,
-    score_threshold: float = 0.3,
 ) -> list[dict]:
     """Retrieve and deduplicate chunks for all above-threshold conditions (image path).
 
@@ -65,8 +100,8 @@ def retrieve_for_image_path(
     seen, chunks = set(), []
 
     for item in rag_queries:
-        for chunk in _query_index(
-            item["query"], index, top_k, namespace, score_threshold, item["condition"]
+        for chunk in _hybrid_search(
+            item["query"], index, top_k, namespace, item["condition"]
         ):
             if chunk["chunk_id"] not in seen:
                 seen.add(chunk["chunk_id"])
@@ -79,8 +114,7 @@ def retrieve_for_text_path(
     query: str,
     index: Index,
     namespace: str,
-    top_k: int = 4,
-    score_threshold: float = 0.3,
+    top_k: int | None = None,
 ) -> list[dict]:
-    """Retrieve chunks without condition filter for general text Q&A path."""
-    return _query_index(query, index, top_k, namespace, score_threshold)
+    """Retrieve chunks without a condition filter, for the general text Q&A path."""
+    return _hybrid_search(query, index, top_k or settings.rag_top_k, namespace, None)

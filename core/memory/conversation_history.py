@@ -37,9 +37,7 @@ def get_conversation_transcript(
             turn["above_threshold"] = i.cnn_result.above_threshold if i.cnn_result else []
             if i.llm_output and i.llm_output.call2_output:
                 turn["clinical_summary"] = i.llm_output.call2_output.get("clinical_summary")
-            # Raw identifiers only, no signed URLs here — this function is also called by
-            # build_prior_context_from_transcript() on the hot LLM-context-reconstruction path,
-            # which never needs image URLs and shouldn't pay for Supabase re-signing calls.
+
             turn["image_hash"] = i.image_hash
             turn["gradcam_conditions"] = [
                 {"condition": g.condition, "dominant_zones": g.dominant_zones, "aligned": g.aligned}

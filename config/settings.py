@@ -21,9 +21,11 @@ class Settings(BaseSettings):
 
       # Groq
     groq_api_key: str
-    groq_model: str = "openai/gpt-oss-20b"  # migrated: llama-3.1-8b-instant shuts down 2026-08-16
+    groq_model: str = "openai/gpt-oss-20b" 
+    llm_reasoning_effort: str = "low"
     llm_temperature: float = 0.2
-    llm_max_tokens: int = 1024
+    llm_max_tokens: int = 2048
+    llm2_max_tokens: int = 4096
 
     # Database
     database_url: str
@@ -38,39 +40,64 @@ class Settings(BaseSettings):
 
     # Pinecone
     pinecone_api_key: str
-    pinecone_index_name: str  = "medassist-knowledge"
+    pinecone_index_name: str  = "medassist-knowledge-v1"
     pinecone_namespace: str = "clinical"
-    rag_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+ 
+    rag_embedding_model: str = "NeuML/pubmedbert-base-embeddings"
+    rag_embedding_dim: int = 768
     rag_top_k: int = 4
-    rag_score_threshold: float = 0.3
+    rag_candidate_multiplier: int = 3
+    rag_rrf_k: int = 60          # Cormack et al. (2009); damps how much rank 1 dominates
 
     # Redis (cache + session memory)
     redis_url: str
     redis_cache_ttl_seconds: int = 2_592_000   # 30 days
     redis_session_ttl_seconds: int = 3_600       # 1 hour, sliding
-    kb_version: str = "v1"        # bump after KB content updates to invalidate cache
+    kb_version: str = "v4"  
 
     # CNN
     model_repo_id: str
     model_dir: Path = BASE_DIR / "models" / "weights"
     model_weights_path: Path = model_dir / "multilabel_model.pt"
     thresholds_path: Path = model_dir / "multilabel_thresholds.json"
+    bm25_corpus_path: Path = model_dir / "bm25_corpus.json"
     cnn_image_size: int = 224
     cnn_num_classes: int = 14
 
     # CLIP
     clip_model_name: str = "ViT-B/32"
     clip_prototype: Path = model_dir / "clip_prototype.json"
-    clip_fallback_threshold: float = 0.6
+    clip_warn_threshold: float = 0.34
+    clip_reject_threshold: float = 0.46
     clip_valid_prompts: list[str] = [
-        "a chest X-ray image",
-        "a thoracic radiograph",
-        "a medical X-ray of the lungs",
+        "a chest X-ray",
+        "a chest radiograph",
+        "a frontal chest X-ray showing the lungs and heart",
+        "a posteroanterior chest radiograph",
+        "an X-ray image of the thorax",
     ]
-    clip_invalid_prompts: list[str]  = [
+    clip_invalid_prompts: list[str] = [
+        # Other radiographic regions — the confusions that actually occur
+        "an X-ray of a knee",
+        "an X-ray of a hand",
+        "an X-ray of a wrist",
+        "an X-ray of a shoulder",
+        "an X-ray of a foot",
+        "an X-ray of the pelvis",
+        "an X-ray of the spine",
+        "an X-ray of a skull",
+        "an abdominal X-ray",
+        "a dental X-ray",
+        # Other modalities
+        "a CT scan slice",
+        "an MRI scan",
+        "an ultrasound image",
+        "a mammogram",
+        # Not medical imaging at all
         "a photograph of a person",
-        "a natural scene photo",
+        "a natural scene photograph",
         "a document or text image",
+        "a photograph of a computer screen",
     ]
 
     # GradCAM 

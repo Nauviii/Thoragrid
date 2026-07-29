@@ -1,15 +1,4 @@
-"""Pick and draw a chart for an analytics result, deterministically, from the data's shape.
-
-The agent answers open-ended questions, so the result shape is not known ahead of time.
-This inspects column types, cardinality and row count and returns the one form that fits —
-including "none", when a table says it better. Nothing here calls an LLM.
-
-Condition bars are drawn in that condition's own hue, the same one its badge and its GradCAM
-overlay use. Colour is therefore carrying identity, not decoration: a reader who has learnt
-that Emphysema is olive in a heatmap reads it as olive in a bar chart too. Labels that are
-not conditions get a single neutral colour rather than an arbitrary rainbow, because there
-is nothing for the hues to mean.
-"""
+"""Pick and draw a chart for an analytics result, deterministically, from the data's shape."""
 
 import altair as alt
 import pandas as pd
@@ -39,9 +28,6 @@ def choose_chart(df: pd.DataFrame) -> tuple[str, dict] | None:
     if not numeric_cols:
         return None
 
-    # One row carrying one figure is a headline number. Checked before the two-column rule,
-    # because a bare aggregate like avg_confidence arrives as a single unlabelled column and
-    # would otherwise fall through to a one-cell table.
     if len(df) == 1 and len(numeric_cols) == 1:
         return "metric", {"label": label_cols[0] if label_cols else None,
                           "value": numeric_cols[0]}
@@ -49,8 +35,6 @@ def choose_chart(df: pd.DataFrame) -> tuple[str, dict] | None:
     if len(df.columns) < 2 or len(df) < _MIN_ROWS_FOR_CHART:
         return None
 
-    # A time column means the question was about change over time; a line reads that far
-    # better than bars, whatever else came back alongside it.
     if time_cols:
         return "line", {"x": time_cols[0], "y": numeric_cols[0]}
 
@@ -148,10 +132,10 @@ def render_result_chart(df: pd.DataFrame) -> str | None:
 
     if kind == "line":
         st.line_chart(df, x=kwargs["x"], y=kwargs["y"], color=SIGNAL,
-                      height=_CHART_HEIGHT, use_container_width=True)
+                      height=_CHART_HEIGHT, width="stretch")
         return kind
 
     ordered = df.sort_values(kwargs["y"], ascending=False)
     st.altair_chart(_bar_chart(ordered, kwargs["x"], kwargs["y"], horizontal=(kind == "hbar")),
-                    use_container_width=True)
+                    width="stretch")
     return kind

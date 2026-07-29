@@ -56,7 +56,9 @@ def validate_llm2_output(parsed: dict) -> bool:
 
 
 def validate_text_qa_output(parsed: dict) -> bool:
-    """Return True if text Q&A output avoids definitive diagnostic-certainty language."""
-    if _has_definitive_diagnosis(parsed.get("answer", "")):
-        return False
-    return not _has_definitive_diagnosis(parsed.get("cross_specialty_notes"))
+    """Return True if text Q&A output avoids definitive diagnostic-certainty language.
+
+    Only the answer is checked. The text path no longer carries cross_specialty_notes — that
+    field belongs to image analysis, where a finding can implicate another specialty.
+    """
+    return not _has_definitive_diagnosis(parsed.get("answer", ""))

@@ -1,14 +1,4 @@
-"""Render the 7-zone anatomical grid as a compact SVG schematic.
-
-Coordinates mirror CHEST_REGIONS in core/gradcam/region_map.py exactly, so the schematic
-shows the same zone boundaries the backend actually measured activation against — this is
-a readout of real data, not a decorative approximation. The same figure, abstracted, is the
-product's mark; see theme.brand_mark.
-
-Every zone is labelled, not only the dominant ones. An unlabelled grid asks the reader to
-remember which cell is which, and the labels are what make it legible as anatomy rather
-than as decoration — the inactive ones simply recede.
-"""
+"""Render the 7-zone anatomical grid as a compact SVG schematic."""
 
 from app.theme import SIGNAL, TEXT_MUTED
 

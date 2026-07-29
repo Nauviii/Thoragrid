@@ -34,6 +34,7 @@ class ImageAnalysisResponse(BaseModel):
     interaction_id: str
     conversation_id: str
     xray_url: str        # signed URL of the normalized upload, for side-by-side reading
+    quality_flagged: bool = False   # accepted, but presented outside the trained range
     all_scores: dict[str, float]
     above_threshold: list[str]
     low_confidence_flag: bool
@@ -45,11 +46,15 @@ class ImageAnalysisResponse(BaseModel):
 
 
 class TextQAResponse(BaseModel):
-    """Response body for POST /query."""
+    """Response body for POST /query.
+
+    No cross_specialty_notes: that belongs to image analysis, where a detected finding can
+    genuinely implicate another specialty. On a free-text question the field had nothing to
+    hold, so it was filled for the sake of being filled.
+    """
     interaction_id: str
     conversation_id: str
     answer: str
-    cross_specialty_notes: str | None
     latency_ms: int
 
 

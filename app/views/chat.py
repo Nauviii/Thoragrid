@@ -5,7 +5,12 @@ findings with it. Case controls live in the rail rather than the reading column:
 is for the study and what the system says about it, nothing else.
 """
 
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from app import api_client
 from app.theme import empty_state
@@ -84,7 +89,7 @@ def _render_case_panel() -> tuple[object, bool]:
                 f'{turns} stud{"y" if turns == 1 else "ies"} read</div>',
                 unsafe_allow_html=True,
             )
-            if st.button("End case", use_container_width=True):
+            if st.button("End case", width="stretch"):
                 _reset_conversation()
                 st.rerun()
         else:
@@ -99,7 +104,7 @@ def _render_case_panel() -> tuple[object, bool]:
             "Chest radiograph", type=["png", "jpg", "jpeg"], label_visibility="collapsed",
         )
         analyze = st.button(
-            "Analyse study", use_container_width=True, disabled=uploaded is None, type="primary",
+            "Analyse study", width="stretch", disabled=uploaded is None, type="primary",
         )
     return uploaded, analyze
 
@@ -113,8 +118,7 @@ def _replay(turns: list[dict]) -> None:
             render_user_upload(turn["content"])
         elif turn["kind"] == "assistant_text":
             render_assistant_text(
-                turn["answer"], turn["cross_specialty_notes"],
-                turn.get("latency_ms"), turn.get("interaction_id"),
+                turn["answer"], turn.get("latency_ms"), turn.get("interaction_id"),
             )
         elif turn["kind"] == "analysis":
             render_analysis(turn["result"])
@@ -188,7 +192,6 @@ def render() -> None:
             "kind": "assistant_text",
             "interaction_id": result["interaction_id"],
             "answer": result["answer"],
-            "cross_specialty_notes": result["cross_specialty_notes"],
             "latency_ms": result["latency_ms"],
         })
         st.rerun()

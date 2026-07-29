@@ -1,4 +1,4 @@
-"""Integration tests for RAG retrieval pipeline against live Pinecone index."""
+"""Integration tests for hybrid RAG retrieval against the live Pinecone index."""
 
 import sys
 from pathlib import Path
@@ -11,7 +11,9 @@ from pinecone import Pinecone
 from config.settings import settings
 from core.rag.retriever import retrieve_for_image_path, retrieve_for_text_path
 
-REQUIRED_CHUNK_KEYS = {"chunk_id", "condition", "section", "source", "text", "score"}
+# `score` is deliberately absent: it exists only for dense hits, and asserting on it would
+# quietly forbid lexical-only results — the ones hybrid retrieval was added to recover.
+REQUIRED_CHUNK_KEYS = {"chunk_id", "condition", "section", "source", "text"}
 
 
 @pytest.fixture(scope="module")
@@ -29,22 +31,36 @@ def test_text_path_returns_chunks(index):
         index=index,
         namespace=settings.pinecone_namespace,
         top_k=4,
-        score_threshold=settings.rag_score_threshold,
     )
     assert len(results) > 0
     assert all(REQUIRED_CHUNK_KEYS.issubset(c.keys()) for c in results)
 
 
-def test_text_path_score_threshold(index):
-    """All returned chunks meet the minimum score threshold."""
+def test_lexical_half_is_available(index):
+    """Hybrid needs the corpus artifact; without it retrieval silently falls back to dense.
+
+    A silent fallback is the right behaviour in production and the wrong thing to discover in
+    a benchmark, so it is asserted rather than assumed.
+    """
+    from core.rag import bm25_index
+
+    assert bm25_index.is_available(), (
+        "models/weights/bm25_corpus.json is missing — re-run ingestion, or every hybrid "
+        "result below is really dense-only"
+    )
+
+
+def test_exact_term_is_retrievable(index):
+    """The case hybrid exists for: a rare token an embedding blurs into its neighbours."""
     results = retrieve_for_text_path(
-        query="pleural fluid accumulation costophrenic blunting",
+        query="tension pneumothorax needle decompression",
         index=index,
         namespace=settings.pinecone_namespace,
         top_k=4,
-        score_threshold=settings.rag_score_threshold,
     )
-    assert all(c["score"] >= settings.rag_score_threshold for c in results)
+    assert results
+    joined = " ".join(c["text"].lower() for c in results)
+    assert "pneumothorax" in joined
 
 
 def test_text_path_top_k_respected(index):
@@ -54,8 +70,7 @@ def test_text_path_top_k_respected(index):
         query="pneumonia treatment antibiotics",
         index=index,
         namespace=settings.pinecone_namespace,
-        top_k=top_k,
-        score_threshold=0.0,  # disable threshold to ensure we're testing top_k only
+        top_k=top_k,  # disable threshold to ensure we're testing top_k only
     )
     assert len(results) <= top_k
 
@@ -67,7 +82,6 @@ def test_text_path_text_field_nonempty(index):
         index=index,
         namespace=settings.pinecone_namespace,
         top_k=4,
-        score_threshold=settings.rag_score_threshold,
     )
     assert all(len(c["text"].strip()) > 0 for c in results)
 
@@ -81,7 +95,6 @@ def test_image_path_condition_filter(index):
         rag_queries=rag_queries,
         index=index,
         namespace=settings.pinecone_namespace,
-        score_threshold=0.0,
     )
     assert all(c["condition"] == "Effusion" for c in results)
 
@@ -96,7 +109,6 @@ def test_image_path_multi_condition_no_crossleak(index):
         rag_queries=rag_queries,
         index=index,
         namespace=settings.pinecone_namespace,
-        score_threshold=0.0,
     )
     returned_conditions = {c["condition"] for c in results}
     assert returned_conditions.issubset({"Pneumonia", "Pneumothorax"})
@@ -112,7 +124,6 @@ def test_image_path_no_duplicate_chunk_ids(index):
         rag_queries=rag_queries,
         index=index,
         namespace=settings.pinecone_namespace,
-        score_threshold=0.0,
     )
     chunk_ids = [c["chunk_id"] for c in results]
     assert len(chunk_ids) == len(set(chunk_ids))
@@ -130,7 +141,6 @@ def test_image_path_adaptive_top_k_four_conditions(index):
         rag_queries=rag_queries,
         index=index,
         namespace=settings.pinecone_namespace,
-        score_threshold=0.0,
     )
     assert len(results) <= 8  # 4 conditions x top_k=2
 
@@ -143,3 +153,23 @@ def test_image_path_low_confidence_empty_input(index):
         namespace=settings.pinecone_namespace,
     )
     assert results == []
+
+def test_every_chunk_carries_a_score_key(index):
+    """Consumers read chunk["score"] unconditionally; a lexical-only hit must not omit it.
+
+    This is a regression test. Chunks recovered by BM25 alone are materialised from the corpus
+    artifact, which stores no cosine similarity, and the RAG audit log builds its score list
+    with a plain subscript — so the first lexical-only hit in production raised KeyError inside
+    the /query route. The value may be None, meaning "retrieved lexically"; the key may not be
+    missing.
+    """
+    results = retrieve_for_text_path(
+        query="tension pneumothorax needle decompression",
+        index=index,
+        namespace=settings.pinecone_namespace,
+        top_k=4,
+    )
+    assert results
+    for chunk in results:
+        assert "score" in chunk, f"{chunk['chunk_id']} came back without a score key"
+        assert chunk["score"] is None or isinstance(chunk["score"], (int, float))

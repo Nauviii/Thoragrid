@@ -1,9 +1,4 @@
-"""Unit tests for pure presentation helpers (no Streamlit runtime needed).
-
-These functions return HTML/prose strings or chart choices and hold no Streamlit state, so
-they are testable directly — unlike the render() functions around them, which are exercised
-manually. Every helper here is deterministic: no LLM is involved in any of these outputs.
-"""
+"""Unit tests for pure presentation helpers (no Streamlit runtime needed)."""
 
 import sys
 from pathlib import Path

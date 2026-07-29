@@ -1,9 +1,15 @@
-"""Embed text chunks and upsert vectors to Pinecone."""
+"""Embed text chunks and upsert vectors to Pinecone.
+
+The BM25 corpus artifact is written by the ingestion script rather than here: this runs
+once per condition, and building the artifact inside it would leave only the last one.
+"""
 
 from sentence_transformers import SentenceTransformer
 from pinecone import Index
 
-_MODEL = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+from config.settings import settings
+
+_MODEL = SentenceTransformer(settings.rag_embedding_model)
 
 
 def embed_and_upsert(

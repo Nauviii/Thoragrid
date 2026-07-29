@@ -108,14 +108,12 @@ def test_validate_llm2_output_rejects_definitive_cross_specialty_notes():
 
 def test_validate_text_qa_output_rejects_definitive_diagnosis():
     """Text Q&A answer with definitive diagnosis language fails validation."""
-    parsed = {"answer": "Anda menderita efusi pleura.", "cross_specialty_notes": None}
-    assert validate_text_qa_output(parsed) is False
+    assert validate_text_qa_output({"answer": "Anda menderita efusi pleura."}) is False
 
 
 def test_validate_text_qa_output_accepts_calibrated_answer():
     """Text Q&A answer with calibrated hedging passes validation."""
-    parsed = {"answer": "Pleural effusion typically presents with dullness to percussion.",
-              "cross_specialty_notes": None}
+    parsed = {"answer": "Pleural effusion typically presents with dullness to percussion."}
     assert validate_text_qa_output(parsed) is True
 
 
@@ -202,8 +200,8 @@ def test_build_text_qa_user_prompt_no_chunks():
 
 
 def test_parse_text_qa_output_valid():
-    """Valid JSON with answer and cross_specialty_notes parses without error."""
-    raw = '{"answer": "Typically caused by rupture of subpleural blebs.", "cross_specialty_notes": null}'
+    """Valid JSON carrying only the answer parses without error."""
+    raw = '{"answer": "Typically caused by rupture of subpleural blebs."}'
     result = parse_text_qa_output(raw)
     assert "blebs" in result["answer"]
 
@@ -211,7 +209,21 @@ def test_parse_text_qa_output_valid():
 def test_parse_text_qa_output_missing_key_raises():
     """Missing answer key raises ValueError."""
     with pytest.raises(ValueError):
-        parse_text_qa_output('{"cross_specialty_notes": null}')
+        parse_text_qa_output('{"something_else": null}')
+
+
+def test_text_qa_schema_carries_no_cross_specialty_notes():
+    """The field belongs to image analysis; on the text path it had nothing to hold.
+
+    Left in the schema, the model felt obliged to populate it — and on one occasion narrated
+    "Cross-specialty notes: null" into the answer body itself, where a reader saw it.
+    """
+    from core.llm.prompts import TEXT_QA_SCHEMA, LLM2_SCHEMA
+
+    assert "cross_specialty_notes" not in TEXT_QA_SCHEMA["properties"]
+    assert "cross_specialty_notes" not in TEXT_QA_SCHEMA["required"]
+    # The image path keeps it: there, a detected finding really can implicate another specialty.
+    assert "cross_specialty_notes" in LLM2_SCHEMA["properties"]
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +305,7 @@ def dummy_query():
 
 def test_cache_text_set_and_get_roundtrip(dummy_query):
     """A stored text Q&A value is retrievable and matches exactly."""
-    value = {"answer": "test answer", "cross_specialty_notes": None}
+    value = {"answer": "test answer"}
     set_cached_text(dummy_query, value)
     assert get_cached_text(dummy_query) == value
 

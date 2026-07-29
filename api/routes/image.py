@@ -56,19 +56,12 @@ def analyze_xray(
 
     validation = clip_validate(image)
     if not validation.is_valid:
-        # Structured detail: the UI renders reason-specific guidance from `code`, while
-        # `reason` keeps the scores for logs and support without being shown to clinicians.
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail={"code": validation.code, "reason": validation.reason},
         )
 
     inference_out = run_inference(image, model)
-
-    # Normalize to PNG regardless of the original upload format (JPEG, BMP, etc.) —
-    # keeps the storage extension/content-type truthful and applies Pillow's lossless
-    # PNG optimization. No lossy compression is applied: pixel values are unaltered,
-    # which matters for diagnostic imagery that CNN/GradCAM analysis depends on.
     png_buffer = io.BytesIO()
     image.convert("RGB").save(png_buffer, format="PNG", optimize=True)
     normalized_bytes = png_buffer.getvalue()
@@ -170,6 +163,7 @@ def analyze_xray(
         interaction_id=interaction.id,
         conversation_id=resolved_conversation_id,
         xray_url=xray_url,
+        quality_flagged=validation.quality_flagged,
         all_scores=inference_out["all_scores"],
         above_threshold=inference_out["above_threshold"],
         low_confidence_flag=inference_out["low_confidence_flag"],

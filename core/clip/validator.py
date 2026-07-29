@@ -30,16 +30,24 @@ from config.settings import settings
 
 @dataclass
 class ValidationResult:
-    """Output of CLIP validation pipeline."""
-    is_valid:       bool
-    layer1_passed:  bool
-    layer2_passed:  bool
-    code:           str     # machine-readable: valid | not_a_chest_xray | outside_training_distribution
-    reason:         str
-    valid_score:    float   # mean cosine sim vs valid prompts
-    invalid_score:  float   # mean cosine sim vs invalid prompts
-    distance:       float   # Euclidean distance to NIH centroid
-    threshold:      float   # calibrated rejection threshold
+    """Output of the CLIP validation pipeline.
+
+    `is_valid` covers both accepted outcomes: a study inside the trained range and one that is
+    readable but presented outside it. The second is distinguished by `quality_flagged` rather
+    than by refusing it, because such an image is still a chest radiograph and the CNN still
+    reads the right anatomy — blocking it costs a real study, while flagging it costs nothing.
+    """
+    is_valid:        bool
+    layer1_passed:   bool
+    layer2_passed:   bool   # within the reject boundary; a flagged image still passes
+    quality_flagged: bool   # accepted, but outside the range the CNN was trained on
+    code:            str    # valid | quality_warning | not_a_chest_xray | outside_training_distribution
+    reason:          str
+    valid_score:     float  # mean cosine sim vs valid prompts
+    invalid_score:   float  # mean cosine sim vs invalid prompts
+    distance:        float  # Euclidean distance to NIH centroid
+    warn_threshold:  float
+    reject_threshold: float
 
 
 _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -60,16 +68,19 @@ def _load_clip() -> tuple:
 
 
 def _load_prototype() -> dict:
-    """Load NIH prototype centroid and threshold from JSON artifact."""
+    """Load the NIH prototype centroid from the JSON artifact.
+
+    The artifact's own `threshold` field is deliberately ignored. It was derived as
+    mean + 1.5 sigma over the calibration draw, which fixed how many calibration images fell
+    outside and said nothing about anything else; measured on held-out studies the same cut
+    refused 10.4% of genuine chest films. The operating point now lives in settings, where it
+    can be retuned from measurement without recomputing the centroid.
+    """
     global _prototype
     if _prototype is None:
-        proto_path = settings.clip_prototype
-        with open(proto_path) as f:
+        with open(settings.clip_prototype) as f:
             data = json.load(f)
-        _prototype = {
-            "centroid":  np.array(data["centroid"], dtype=np.float32),
-            "threshold": float(data["threshold"]),
-        }
+        _prototype = {"centroid": np.array(data["centroid"], dtype=np.float32)}
     return _prototype
 
 
@@ -110,38 +121,45 @@ def _layer1_prompt_check(image_emb: np.ndarray) -> tuple[bool, float, float]:
     return passed, valid_score, invalid_score
 
 
-def _layer2_prototype_check(image_emb: np.ndarray) -> tuple[bool, float, float]:
-    """Layer 2: Euclidean distance to NIH ChestX-ray14 prototype centroid.
+def _layer2_distance(image_emb: np.ndarray) -> float:
+    """Layer 2: distance from the image to the NIH ChestX-ray14 prototype centroid.
 
-    Returns (passed, distance, threshold).
-    Uses Euclidean distance per Snell et al. (2017) recommendation —
-    shown to outperform cosine for prototype-based classification.
-    Threshold τ = mean_dist + 1.5 × std_dist, calibrated on 500 NIH samples.
+    Note that with L2-normalized embeddings this ranks identically to cosine similarity:
+    ||q - c||^2 = 1 - 2(q.c) + ||c||^2 is strictly decreasing in q.c, so the choice between
+    the two metrics changes nothing here. Measured separation is nonetheless near-perfect
+    against non-chest radiographs (AUROC 1.000) and non-medical images (AUROC 1.000).
+
+    Banding is left to validate(); this returns the raw distance so the two thresholds are
+    applied in one place.
     """
-    prototype = _load_prototype()
-    centroid = prototype["centroid"]
-    threshold = prototype["threshold"]
-
-    distance = float(np.linalg.norm(image_emb - centroid))
-    passed = distance <= threshold
-
-    return passed, distance, threshold
+    centroid = _load_prototype()["centroid"]
+    return float(np.linalg.norm(image_emb - centroid))
 
 
 def validate(image: Image.Image) -> ValidationResult:
     """Run two-layer CLIP validation on a PIL image.
 
+    Layer 1 asks whether this is the right kind of image; layer 2 asks whether it resembles
+    what the CNN was trained on. They are orthogonal, and only the second can catch a chest
+    film that is genuinely a chest film but unreadable — an inverted greyscale study passes
+    any prompt classifier and still breaks the model.
+
     Args:
         image: Input PIL image from user upload.
 
     Returns:
-        ValidationResult with layer-wise decisions and scores.
+        ValidationResult with layer-wise decisions, scores, and the band it fell into.
     """
     image_emb = _encode_image(image)
 
     layer1_passed, valid_score, invalid_score = _layer1_prompt_check(image_emb)
-    layer2_passed, distance, threshold = _layer2_prototype_check(image_emb)
+    distance = _layer2_distance(image_emb)
 
+    warn = settings.clip_warn_threshold
+    reject = settings.clip_reject_threshold
+
+    layer2_passed = distance <= reject
+    quality_flagged = layer2_passed and distance > warn
     is_valid = layer1_passed and layer2_passed
 
     if not layer1_passed:
@@ -154,7 +172,13 @@ def validate(image: Image.Image) -> ValidationResult:
         code = "outside_training_distribution"
         reason = (
             f"Image distribution inconsistent with NIH ChestX-ray14 "
-            f"(distance={distance:.3f}, threshold={threshold:.3f})"
+            f"(distance={distance:.3f}, reject_threshold={reject:.3f})"
+        )
+    elif quality_flagged:
+        code = "quality_warning"
+        reason = (
+            f"Chest X-ray accepted with reduced confidence in presentation "
+            f"(distance={distance:.3f}, warn_threshold={warn:.3f})"
         )
     else:
         code = "valid"
@@ -164,10 +188,12 @@ def validate(image: Image.Image) -> ValidationResult:
         is_valid = is_valid,
         layer1_passed = layer1_passed,
         layer2_passed = layer2_passed,
+        quality_flagged = quality_flagged,
         code = code,
         reason = reason,
         valid_score = round(valid_score, 4),
         invalid_score = round(invalid_score, 4),
         distance = round(distance, 4),
-        threshold = round(threshold, 4),
+        warn_threshold = warn,
+        reject_threshold = reject,
     )

@@ -15,12 +15,6 @@ from app.components.zone_grid import zone_panel
 from app.components.confidence_chart import confidence_chart_html, low_confidence_narrative
 from app.components.feedback_control import render_feedback
 
-
-# Prose assembles on first render instead of landing as a block. The backend returns the
-# whole answer in one response — there is no token stream to follow — so this is pacing,
-# not real streaming: it does not shorten the wait before the first word, it only stops a
-# finished paragraph appearing all at once. Evidence (badges, images, zones) is never paced;
-# a reader waiting on a study should not wait on an animation to see it.
 _REVEAL_WORDS = 3      # words per frame
 _REVEAL_DELAY = 0.018  # seconds between frames
 
@@ -59,13 +53,15 @@ def render_user_upload(filename: str) -> None:
         st.markdown(f'<span class="ma-file">{filename}</span>', unsafe_allow_html=True)
 
 
-def render_assistant_text(answer: str, cross_specialty_notes: str | None,
-                          latency_ms: int | None = None, interaction_id: str | None = None) -> None:
-    """Render a written answer, with any cross-specialty note and its feedback control."""
+def render_assistant_text(answer: str, latency_ms: int | None = None,
+                          interaction_id: str | None = None) -> None:
+    """Render a written answer and its feedback control.
+
+    Cross-specialty notes are not shown here. They are a property of a detected finding, so
+    they appear under an image analysis and nowhere else.
+    """
     with st.chat_message("assistant"):
         _reveal(answer, f"{interaction_id}:answer")
-        if cross_specialty_notes:
-            _render_cross_specialty(cross_specialty_notes)
         _render_latency({"latency_ms": latency_ms})
         if interaction_id:
             render_feedback(interaction_id)
@@ -133,10 +129,29 @@ def _render_finding(condition_out: dict, finding: dict | None, xray_url: str,
         _reveal(condition_out["explanation"], reveal_key)
 
 
+def _render_quality_banner() -> None:
+    """Tell the reader the study was accepted but sits outside the range the model was trained on.
+
+    Shown above the findings, not below them: it changes how everything underneath should be
+    weighed, and a caution placed after the conclusions has already been read too late.
+    """
+    st.warning("This study was read, but its presentation sits outside the trained range.")
+    st.markdown(
+        '<div class="ma-caption">Contrast, exposure, projection or field of view differ from '
+        "the studies this model was trained on. The findings below are still localised to real "
+        "anatomy, but confidence in them is lower than the scores suggest. Where it matters, "
+        "re-export the study from PACS without adjustment and read it again.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown('<hr class="ma-divider" style="margin:1rem 0">', unsafe_allow_html=True)
+
+
 def render_analysis(result: dict) -> None:
     """Render a full image analysis: findings, activation, zones, and the summary."""
     with st.chat_message("assistant"):
         scores = result["all_scores"]
+        if result.get("quality_flagged"):
+            _render_quality_banner()
 
         if result["low_confidence_flag"]:
             lead, reading = low_confidence_narrative(scores)

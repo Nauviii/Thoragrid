@@ -24,7 +24,7 @@ FILM         = "#EFF3F6"   # the diffuser glow of the reading surface
 SURFACE      = "#FFFFFF"   # cards on film
 LINE         = "#DCE3EA"   # hairlines on film
 TEXT         = "#101A24"
-TEXT_MUTED   = "#66768A"
+TEXT_MUTED   = "#5C6A7C"  # 4.94:1 on film, clears AA for body text
 SIGNAL       = "#0E7C86"   # deep clinical teal: primary action, active state
 SIGNAL_SOFT  = "#E1F0F1"
 HALO         = "#6FD3DA"   # light teal, only ever on ink
@@ -318,6 +318,19 @@ html, body, [class*="css"], .stApp {{
 [class*="st-key-histrow_"] .stButton > button:hover {{
   border-color: var(--signal); background: var(--surface); color: var(--signal);
 }}
+/* Example questions are prompts to pick up, not controls competing with Ask: quiet, left
+   aligned, no border until hovered. */
+[class*="st-key-analytics_example_"] .stButton > button {{
+  background: transparent; border: 1px solid transparent; color: var(--muted);
+  justify-content: flex-start; text-align: left; padding: 0.32rem 0.55rem;
+  font-size: 0.85rem; font-weight: 400;
+}}
+[class*="st-key-analytics_example_"] .stButton > button:hover {{
+  background: var(--surface); border-color: var(--line); color: var(--signal);
+}}
+[class*="st-key-analytics_example_"] .stButton > button p {{ text-align: left; width: 100%; }}
+[class*="st-key-analytics_example_"] {{ margin-bottom: -0.35rem; }}
+
 [class*="st-key-histrow_"] .stButton > button p {{
   text-align: left; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }}

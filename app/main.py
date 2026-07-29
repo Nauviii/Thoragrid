@@ -23,11 +23,6 @@ st.set_page_config(
 # Only the opaque key lives in the browser; the JWT stays server-side in Redis.
 _SESSION_COOKIE = "medassist_session"
 
-# Exactly one instance per script run, at module scope. It cannot be cached, because the
-# constructor issues a keyed widget command and Streamlit forbids those inside cached
-# functions. It cannot be stashed in session_state either: a widget that isn't re-rendered
-# on every run goes stale on the frontend. And it must not be constructed twice in one run,
-# or the two calls collide on the same widget key.
 _cookies = stx.CookieManager(key="medassist_cookie_manager")
 
 
@@ -36,8 +31,6 @@ def _forget_cookie(widget_key: str) -> None:
     try:
         _cookies.delete(_SESSION_COOKIE, key=widget_key)
     except KeyError:
-        # CookieManager.delete() also drops the name from its local dict, which raises if
-        # the cookie was never loaded in this run. The browser-side delete still went out.
         pass
 
 
@@ -95,7 +88,7 @@ def _sign_in_screen() -> None:
         username = st.text_input("Username", placeholder="doctor")
         password = st.text_input("Password", type="password", placeholder="••••••••")
 
-        if st.button("Sign in", use_container_width=True, type="primary"):
+        if st.button("Sign in", width="stretch", type="primary"):
             try:
                 _store_session(api_client.login(username, password))
                 st.rerun()
@@ -137,7 +130,7 @@ def _rail_top(pages: dict) -> None:
     """Render the mark and the navigation rail."""
     st.markdown(brand_lockup(), unsafe_allow_html=True)
     for page in pages.values():
-        st.page_link(page, use_container_width=True)
+        st.page_link(page, width="stretch")
 
 
 def _rail_bottom() -> None:
@@ -150,7 +143,7 @@ def _rail_bottom() -> None:
         f'<div class="ma-user-role">{st.session_state.role}</div></div></div>',
         unsafe_allow_html=True,
     )
-    if st.button("Sign out", use_container_width=True):
+    if st.button("Sign out", width="stretch"):
         _sign_out()
 
 
@@ -162,7 +155,7 @@ def main() -> None:
         _sign_in_screen()
         return
 
-    from app.pages import chat, history, sql_agent
+    from app.views import chat, history, sql_agent
 
     pages = {
         "chat": st.Page(chat.render, title="Chat", url_path="chat",

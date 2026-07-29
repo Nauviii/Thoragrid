@@ -1,0 +1,451 @@
+stratum,path,is_valid,code,distance
+positive,00000003_001.png,True,valid,0.178
+positive,00000013_003.png,False,outside_training_distribution,0.2953
+positive,00000199_001.png,True,valid,0.2243
+positive,00001200_000.png,True,valid,0.1557
+positive,00001208_001.png,True,valid,0.2232
+positive,00001253_001.png,True,valid,0.1556
+positive,00001301_017.png,True,valid,0.2644
+positive,00001483_004.png,True,valid,0.1275
+positive,00001543_001.png,True,valid,0.2255
+positive,00001581_000.png,True,valid,0.2211
+positive,00001809_005.png,True,valid,0.1762
+positive,00001836_067.png,True,valid,0.157
+positive,00001837_000.png,True,valid,0.2021
+positive,00001909_000.png,True,valid,0.1577
+positive,00001931_022.png,True,valid,0.1983
+positive,00002104_003.png,True,valid,0.1775
+positive,00002129_003.png,True,valid,0.2114
+positive,00002224_001.png,True,valid,0.2601
+positive,00002245_003.png,True,valid,0.2305
+positive,00002358_000.png,True,valid,0.1724
+positive,00002457_003.png,False,outside_training_distribution,0.3156
+positive,00002509_023.png,True,valid,0.1561
+positive,00002574_000.png,True,valid,0.1648
+positive,00002704_003.png,False,outside_training_distribution,0.2839
+positive,00002803_004.png,True,valid,0.1571
+positive,00002860_008.png,True,valid,0.2014
+positive,00002896_000.png,False,outside_training_distribution,0.4443
+positive,00002982_000.png,True,valid,0.2408
+positive,00003028_031.png,True,valid,0.2296
+positive,00003071_002.png,True,valid,0.1653
+positive,00003095_001.png,True,valid,0.1527
+positive,00003123_000.png,True,valid,0.1669
+positive,00003224_000.png,True,valid,0.1893
+positive,00003240_000.png,True,valid,0.2218
+positive,00003393_006.png,True,valid,0.2201
+positive,00003413_000.png,False,outside_training_distribution,0.2702
+positive,00003423_009.png,True,valid,0.1811
+positive,00003475_000.png,True,valid,0.1451
+positive,00003482_001.png,True,valid,0.2436
+positive,00003512_001.png,True,valid,0.2086
+positive,00003637_002.png,True,valid,0.2007
+positive,00003834_001.png,True,valid,0.2222
+positive,00003934_000.png,True,valid,0.1476
+positive,00004342_027.png,True,valid,0.1974
+positive,00004382_000.png,True,valid,0.1886
+positive,00004458_002.png,True,valid,0.2379
+positive,00004578_005.png,True,valid,0.1875
+positive,00004605_010.png,False,outside_training_distribution,0.3157
+positive,00004608_009.png,True,valid,0.1656
+positive,00004925_014.png,True,valid,0.1695
+positive,00005066_029.png,True,valid,0.1952
+positive,00005365_011.png,True,valid,0.2004
+positive,00005376_002.png,True,valid,0.2109
+positive,00005403_009.png,True,valid,0.1771
+positive,00005435_003.png,True,valid,0.2295
+positive,00005567_008.png,True,valid,0.2012
+positive,00005577_001.png,True,valid,0.2059
+positive,00005679_002.png,True,valid,0.2598
+positive,00006151_001.png,True,valid,0.1572
+positive,00006318_010.png,True,valid,0.1734
+positive,00006365_000.png,True,valid,0.172
+positive,00006391_001.png,False,outside_training_distribution,0.3495
+positive,00006463_001.png,True,valid,0.2004
+positive,00006506_002.png,True,valid,0.1515
+positive,00006559_000.png,True,valid,0.2093
+positive,00006601_000.png,True,valid,0.1986
+positive,00006635_006.png,True,valid,0.2279
+positive,00006881_007.png,True,valid,0.1593
+positive,00006926_016.png,True,valid,0.1676
+positive,00007007_017.png,True,valid,0.2424
+positive,00007018_060.png,False,outside_training_distribution,0.2891
+positive,00007098_004.png,True,valid,0.183
+positive,00007187_000.png,True,valid,0.1625
+positive,00007317_017.png,True,valid,0.1477
+positive,00007322_010.png,True,valid,0.2125
+positive,00008468_035.png,True,valid,0.2029
+positive,00008468_036.png,True,valid,0.2616
+positive,00008522_025.png,True,valid,0.2414
+positive,00008589_001.png,True,valid,0.1705
+positive,00008694_000.png,True,valid,0.1762
+positive,00008748_001.png,True,valid,0.2023
+positive,00008891_000.png,True,valid,0.1795
+positive,00008911_007.png,True,valid,0.1737
+positive,00009219_005.png,True,valid,0.1827
+positive,00009224_000.png,True,valid,0.2321
+positive,00009286_001.png,False,outside_training_distribution,0.2755
+positive,00009368_013.png,True,valid,0.1931
+positive,00009380_009.png,True,valid,0.1523
+positive,00009669_001.png,True,valid,0.2081
+positive,00009759_000.png,True,valid,0.1608
+positive,00009863_043.png,True,valid,0.2124
+positive,00010012_035.png,True,valid,0.198
+positive,00010092_051.png,True,valid,0.2661
+positive,00010128_003.png,True,valid,0.2293
+positive,00010207_001.png,True,valid,0.1772
+positive,00010248_000.png,True,valid,0.1881
+positive,00010264_009.png,True,valid,0.2212
+positive,00010435_002.png,False,outside_training_distribution,0.3943
+positive,00010664_003.png,True,valid,0.1545
+positive,00010670_004.png,True,valid,0.2092
+positive,00010768_006.png,True,valid,0.2042
+positive,00010973_005.png,True,valid,0.1652
+positive,00010994_007.png,True,valid,0.1644
+positive,00011312_000.png,True,valid,0.1949
+positive,00011548_018.png,True,valid,0.1617
+positive,00011564_001.png,True,valid,0.199
+positive,00011598_018.png,True,valid,0.1305
+positive,00011605_014.png,True,valid,0.1639
+positive,00011632_013.png,True,valid,0.1753
+positive,00011664_000.png,True,valid,0.175
+positive,00011702_006.png,True,valid,0.1797
+positive,00011723_000.png,True,valid,0.136
+positive,00011925_076.png,False,outside_training_distribution,0.3079
+positive,00012185_001.png,True,valid,0.1574
+positive,00012187_000.png,True,valid,0.1408
+positive,00012223_000.png,True,valid,0.1627
+positive,00012303_008.png,True,valid,0.1485
+positive,00012373_000.png,True,valid,0.2334
+positive,00012420_000.png,True,valid,0.148
+positive,00012423_000.png,True,valid,0.1447
+positive,00012479_001.png,True,valid,0.2295
+positive,00012640_016.png,True,valid,0.1837
+positive,00013028_000.png,True,valid,0.1409
+positive,00013080_000.png,True,valid,0.1713
+positive,00013111_110.png,True,valid,0.232
+positive,00013214_004.png,True,valid,0.1884
+positive,00013305_010.png,True,valid,0.2182
+positive,00013594_031.png,True,valid,0.185
+positive,00013615_052.png,False,outside_training_distribution,0.2899
+positive,00013670_061.png,True,valid,0.1502
+positive,00013911_017.png,True,valid,0.1628
+positive,00014174_002.png,True,valid,0.2637
+positive,00014320_003.png,True,valid,0.1999
+positive,00014353_000.png,True,valid,0.1752
+positive,00014356_012.png,True,valid,0.1416
+positive,00014662_002.png,True,valid,0.2142
+positive,00014784_003.png,True,valid,0.1514
+positive,00014828_000.png,True,valid,0.1683
+positive,00014888_019.png,True,valid,0.1927
+positive,00015171_017.png,True,valid,0.1605
+positive,00015256_001.png,True,valid,0.1928
+positive,00015401_013.png,True,valid,0.2469
+positive,00015530_070.png,True,valid,0.2258
+positive,00015606_013.png,False,outside_training_distribution,0.4106
+positive,00015628_017.png,True,valid,0.1505
+positive,00015646_038.png,True,valid,0.2205
+positive,00015647_011.png,True,valid,0.2002
+positive,00015758_013.png,True,valid,0.1996
+positive,00015785_000.png,True,valid,0.2257
+positive,00015856_002.png,True,valid,0.1942
+positive,00015969_000.png,True,valid,0.19
+positive,00016142_024.png,True,valid,0.194
+positive,00016184_003.png,True,valid,0.1615
+positive,00016247_000.png,True,valid,0.1966
+positive,00016258_007.png,True,valid,0.1951
+positive,00016270_004.png,True,valid,0.2536
+positive,00016403_000.png,True,valid,0.1634
+positive,00016429_013.png,True,valid,0.154
+positive,00016434_009.png,True,valid,0.1972
+positive,00016508_033.png,False,outside_training_distribution,0.3286
+positive,00016568_020.png,True,valid,0.1692
+positive,00016589_009.png,True,valid,0.1682
+positive,00016592_003.png,True,valid,0.1765
+positive,00016607_008.png,True,valid,0.1787
+positive,00016660_004.png,True,valid,0.2466
+positive,00016670_000.png,True,valid,0.2152
+positive,00016719_004.png,True,valid,0.1668
+positive,00016739_001.png,True,valid,0.1738
+positive,00016800_005.png,True,valid,0.1846
+positive,00016802_010.png,True,valid,0.1633
+positive,00016888_005.png,True,valid,0.2087
+positive,00016930_007.png,True,valid,0.1821
+positive,00016954_004.png,True,valid,0.1826
+positive,00016964_001.png,False,outside_training_distribution,0.2979
+positive,00016972_007.png,True,valid,0.2656
+positive,00017046_011.png,True,valid,0.1827
+positive,00017049_011.png,True,valid,0.2111
+positive,00017049_012.png,True,valid,0.1709
+positive,00017199_003.png,True,valid,0.2633
+positive,00017324_001.png,False,outside_training_distribution,0.2989
+positive,00017369_002.png,False,outside_training_distribution,0.2724
+positive,00017691_015.png,True,valid,0.1456
+positive,00017786_013.png,True,valid,0.2128
+positive,00018059_000.png,True,valid,0.1576
+positive,00018304_013.png,True,valid,0.2176
+positive,00018347_000.png,True,valid,0.1737
+positive,00018394_003.png,True,valid,0.2109
+positive,00018505_000.png,True,valid,0.1395
+positive,00018680_012.png,True,valid,0.1657
+positive,00018705_004.png,True,valid,0.2191
+positive,00018749_005.png,True,valid,0.1566
+positive,00018810_001.png,True,valid,0.1515
+positive,00018867_011.png,True,valid,0.2222
+positive,00018884_004.png,True,valid,0.1959
+positive,00019124_098.png,True,valid,0.1653
+positive,00019136_000.png,True,valid,0.1319
+positive,00019373_027.png,True,valid,0.172
+positive,00019395_012.png,True,valid,0.1737
+positive,00019466_004.png,True,valid,0.2261
+positive,00019470_000.png,True,valid,0.1878
+positive,00019643_035.png,True,valid,0.2139
+positive,00019736_000.png,True,valid,0.171
+positive,00019812_006.png,True,valid,0.2094
+positive,00020159_003.png,True,valid,0.1722
+positive,00020214_000.png,False,outside_training_distribution,0.2702
+positive,00020678_000.png,True,valid,0.1692
+positive,00020846_000.png,True,valid,0.1911
+positive,00021112_000.png,True,valid,0.1617
+positive,00021303_014.png,True,valid,0.2089
+positive,00021707_003.png,False,outside_training_distribution,0.2785
+positive,00021779_000.png,True,valid,0.2089
+positive,00021835_024.png,True,valid,0.2157
+positive,00021877_000.png,True,valid,0.1808
+positive,00021976_012.png,True,valid,0.1713
+positive,00022030_006.png,True,valid,0.2119
+positive,00022786_000.png,True,valid,0.2186
+positive,00022818_002.png,True,valid,0.2433
+positive,00023128_004.png,True,valid,0.253
+positive,00023480_000.png,True,valid,0.1649
+positive,00024073_000.png,True,valid,0.2421
+positive,00024238_000.png,True,valid,0.1638
+positive,00024404_000.png,True,valid,0.157
+positive,00025080_003.png,True,valid,0.2
+positive,00025290_038.png,False,outside_training_distribution,0.2948
+positive,00025387_000.png,True,valid,0.1633
+positive,00025664_027.png,True,valid,0.2409
+positive,00025787_009.png,True,valid,0.2375
+positive,00025787_018.png,True,valid,0.2432
+positive,00025839_013.png,False,outside_training_distribution,0.3721
+positive,00026155_000.png,True,valid,0.142
+positive,00026196_001.png,True,valid,0.1647
+positive,00026199_009.png,True,valid,0.1768
+positive,00026276_000.png,True,valid,0.1821
+positive,00026410_000.png,True,valid,0.1557
+positive,00026641_000.png,True,valid,0.1834
+positive,00026810_006.png,True,valid,0.184
+positive,00027213_035.png,False,outside_training_distribution,0.3339
+positive,00027415_006.png,False,outside_training_distribution,0.3406
+positive,00027912_001.png,False,outside_training_distribution,0.3046
+positive,00027997_001.png,False,outside_training_distribution,0.271
+positive,00028611_010.png,True,valid,0.203
+positive,00028788_000.png,True,valid,0.221
+positive,00028809_001.png,True,valid,0.2122
+positive,00029075_001.png,True,valid,0.2204
+positive,00029552_000.png,True,valid,0.2403
+positive,00029744_004.png,False,outside_training_distribution,0.3129
+positive,00030375_006.png,True,valid,0.2131
+positive,00030408_012.png,True,valid,0.2544
+positive,00030608_001.png,True,valid,0.2521
+positive,00030683_001.png,True,valid,0.1826
+degraded_chest,blown_out__00001836_067.png,False,outside_training_distribution,0.3059
+degraded_chest,blown_out__00002224_001.png,False,outside_training_distribution,0.438
+degraded_chest,blown_out__00002457_003.png,False,outside_training_distribution,0.3462
+degraded_chest,blown_out__00002860_008.png,True,valid,0.23
+degraded_chest,blown_out__00003834_001.png,False,outside_training_distribution,0.3806
+degraded_chest,blown_out__00006151_001.png,False,outside_training_distribution,0.4473
+degraded_chest,blown_out__00006318_010.png,False,outside_training_distribution,0.3666
+degraded_chest,blown_out__00007098_004.png,False,outside_training_distribution,0.527
+degraded_chest,blown_out__00007322_010.png,False,outside_training_distribution,0.3243
+degraded_chest,blown_out__00009863_043.png,False,outside_training_distribution,0.7772
+degraded_chest,blown_out__00010128_003.png,False,outside_training_distribution,0.2857
+degraded_chest,blown_out__00010207_001.png,False,outside_training_distribution,0.4416
+degraded_chest,blown_out__00010435_002.png,False,outside_training_distribution,0.306
+degraded_chest,blown_out__00012303_008.png,False,outside_training_distribution,0.3735
+degraded_chest,blown_out__00016592_003.png,False,outside_training_distribution,0.3346
+degraded_chest,blown_out__00016802_010.png,False,outside_training_distribution,0.3124
+degraded_chest,blown_out__00019395_012.png,False,outside_training_distribution,0.3592
+degraded_chest,blown_out__00021976_012.png,False,outside_training_distribution,0.2759
+degraded_chest,blown_out__00023480_000.png,False,outside_training_distribution,0.2785
+degraded_chest,blown_out__00024404_000.png,False,outside_training_distribution,0.2956
+degraded_chest,flat_contrast__00001836_067.png,False,outside_training_distribution,0.3211
+degraded_chest,flat_contrast__00002457_003.png,False,outside_training_distribution,0.3516
+degraded_chest,flat_contrast__00003123_000.png,True,valid,0.257
+degraded_chest,flat_contrast__00004925_014.png,True,valid,0.2675
+degraded_chest,flat_contrast__00008468_035.png,False,outside_training_distribution,0.4194
+degraded_chest,flat_contrast__00010092_051.png,False,outside_training_distribution,0.3258
+degraded_chest,flat_contrast__00010264_009.png,False,outside_training_distribution,0.3013
+degraded_chest,flat_contrast__00012373_000.png,False,outside_training_distribution,0.2865
+degraded_chest,flat_contrast__00014828_000.png,True,valid,0.244
+degraded_chest,flat_contrast__00015401_013.png,False,outside_training_distribution,0.4297
+degraded_chest,flat_contrast__00015758_013.png,False,outside_training_distribution,0.3152
+degraded_chest,flat_contrast__00016434_009.png,True,valid,0.2467
+degraded_chest,flat_contrast__00016568_020.png,True,valid,0.241
+degraded_chest,flat_contrast__00017369_002.png,False,outside_training_distribution,0.3516
+degraded_chest,flat_contrast__00018394_003.png,True,valid,0.2563
+degraded_chest,flat_contrast__00021877_000.png,False,outside_training_distribution,0.2831
+degraded_chest,flat_contrast__00024238_000.png,True,valid,0.2351
+degraded_chest,flat_contrast__00025787_009.png,False,outside_training_distribution,0.3107
+degraded_chest,flat_contrast__00027213_035.png,False,outside_training_distribution,0.574
+degraded_chest,flat_contrast__00030683_001.png,False,outside_training_distribution,0.315
+degraded_chest,hard_crop__00000013_003.png,False,outside_training_distribution,0.3996
+degraded_chest,hard_crop__00001301_017.png,False,outside_training_distribution,0.3958
+degraded_chest,hard_crop__00005066_029.png,False,outside_training_distribution,0.2929
+degraded_chest,hard_crop__00005577_001.png,False,outside_training_distribution,0.3609
+degraded_chest,hard_crop__00006318_010.png,False,outside_training_distribution,0.2854
+degraded_chest,hard_crop__00007098_004.png,False,outside_training_distribution,0.3383
+degraded_chest,hard_crop__00011605_014.png,False,outside_training_distribution,0.2824
+degraded_chest,hard_crop__00012187_000.png,False,outside_training_distribution,0.3428
+degraded_chest,hard_crop__00013670_061.png,False,outside_training_distribution,0.3194
+degraded_chest,hard_crop__00015171_017.png,False,outside_training_distribution,0.3554
+degraded_chest,hard_crop__00015606_013.png,False,outside_training_distribution,0.2808
+degraded_chest,hard_crop__00015969_000.png,False,outside_training_distribution,0.3072
+degraded_chest,hard_crop__00016258_007.png,False,outside_training_distribution,0.346
+degraded_chest,hard_crop__00016719_004.png,False,outside_training_distribution,0.3617
+degraded_chest,hard_crop__00017324_001.png,False,outside_training_distribution,0.3543
+degraded_chest,hard_crop__00018059_000.png,False,outside_training_distribution,0.2986
+degraded_chest,hard_crop__00019124_098.png,False,outside_training_distribution,0.3381
+degraded_chest,hard_crop__00020846_000.png,False,outside_training_distribution,0.2816
+degraded_chest,hard_crop__00021112_000.png,False,outside_training_distribution,0.3454
+degraded_chest,hard_crop__00025080_003.png,False,outside_training_distribution,0.335
+degraded_chest,inverted__00001301_017.png,False,outside_training_distribution,0.3458
+degraded_chest,inverted__00001483_004.png,False,outside_training_distribution,0.398
+degraded_chest,inverted__00001543_001.png,False,outside_training_distribution,0.3836
+degraded_chest,inverted__00002574_000.png,False,outside_training_distribution,0.3351
+degraded_chest,inverted__00002704_003.png,False,outside_training_distribution,0.4402
+degraded_chest,inverted__00002896_000.png,False,outside_training_distribution,0.5114
+degraded_chest,inverted__00003028_031.png,False,outside_training_distribution,0.4307
+degraded_chest,inverted__00003413_000.png,False,outside_training_distribution,0.3323
+degraded_chest,inverted__00005567_008.png,False,outside_training_distribution,0.3789
+degraded_chest,inverted__00005679_002.png,False,outside_training_distribution,0.4065
+degraded_chest,inverted__00006463_001.png,False,outside_training_distribution,0.4709
+degraded_chest,inverted__00007018_060.png,False,outside_training_distribution,0.3787
+degraded_chest,inverted__00011632_013.png,False,outside_training_distribution,0.3866
+degraded_chest,inverted__00015171_017.png,False,outside_training_distribution,0.2911
+degraded_chest,inverted__00016142_024.png,False,outside_training_distribution,0.4264
+degraded_chest,inverted__00016607_008.png,False,outside_training_distribution,0.3007
+degraded_chest,inverted__00016964_001.png,False,outside_training_distribution,0.3511
+degraded_chest,inverted__00018680_012.png,False,outside_training_distribution,0.2953
+degraded_chest,inverted__00018705_004.png,True,valid,0.2559
+degraded_chest,inverted__00025839_013.png,False,outside_training_distribution,0.4857
+degraded_chest,rotated_90__00002704_003.png,False,outside_training_distribution,0.4366
+degraded_chest,rotated_90__00002803_004.png,False,outside_training_distribution,0.2897
+degraded_chest,rotated_90__00002896_000.png,False,outside_training_distribution,0.5858
+degraded_chest,rotated_90__00003512_001.png,False,outside_training_distribution,0.4272
+degraded_chest,rotated_90__00003637_002.png,False,outside_training_distribution,0.4724
+degraded_chest,rotated_90__00005567_008.png,False,outside_training_distribution,0.415
+degraded_chest,rotated_90__00006881_007.png,False,outside_training_distribution,0.3766
+degraded_chest,rotated_90__00007098_004.png,False,outside_training_distribution,0.3684
+degraded_chest,rotated_90__00009368_013.png,False,outside_training_distribution,0.3261
+degraded_chest,rotated_90__00009380_009.png,False,outside_training_distribution,0.3499
+degraded_chest,rotated_90__00009669_001.png,False,outside_training_distribution,0.5015
+degraded_chest,rotated_90__00010012_035.png,False,outside_training_distribution,0.4263
+degraded_chest,rotated_90__00010435_002.png,False,outside_training_distribution,0.5543
+degraded_chest,rotated_90__00011632_013.png,False,outside_training_distribution,0.475
+degraded_chest,rotated_90__00016258_007.png,False,outside_training_distribution,0.33
+degraded_chest,rotated_90__00017199_003.png,False,outside_training_distribution,0.4828
+degraded_chest,rotated_90__00019136_000.png,False,outside_training_distribution,0.4588
+degraded_chest,rotated_90__00020846_000.png,False,outside_training_distribution,0.3754
+degraded_chest,rotated_90__00022818_002.png,False,outside_training_distribution,0.5311
+degraded_chest,rotated_90__00029744_004.png,False,outside_training_distribution,0.5223
+non_medical,"ChatGPT Image Jul 24, 2026, 10_10_55 PM (1).png",False,not_a_chest_xray,1.0563
+non_medical,"ChatGPT Image Jul 24, 2026, 10_10_55 PM (2).png",False,not_a_chest_xray,1.0255
+non_medical,"ChatGPT Image Jul 24, 2026, 10_11_32 PM.png",False,not_a_chest_xray,1.0255
+non_medical,"ChatGPT Image Jul 24, 2026, 10_12_12 PM.png",False,not_a_chest_xray,1.0727
+non_medical,"ChatGPT Image Jun 30, 2026, 09_47_58 PM.png",False,not_a_chest_xray,0.9478
+non_medical,"ChatGPT Image Jun 30, 2026, 10_16_34 PM.png",False,not_a_chest_xray,1.0513
+non_medical,"ChatGPT Image Jun 30, 2026, 10_16_38 PM.png",False,not_a_chest_xray,1.0513
+non_medical,"ChatGPT Image May 17, 2026, 05_07_34 PM.png",False,not_a_chest_xray,1.0817
+non_medical,"ChatGPT Image May 17, 2026, 05_25_36 PM.png",False,not_a_chest_xray,1.1433
+non_medical,"ChatGPT Image May 17, 2026, 09_44_26 PM.png",False,not_a_chest_xray,1.1156
+non_medical,"ChatGPT Image May 17, 2026, 09_47_17 PM.png",False,outside_training_distribution,1.1203
+non_medical,twibbon DAC.png,False,not_a_chest_xray,1.1592
+non_medical,twibbon.jpeg,False,not_a_chest_xray,1.0672
+non_medical,Untitled design (1).png,False,not_a_chest_xray,1.216
+non_medical,Untitled design.png,False,not_a_chest_xray,0.9632
+non_medical,WhatsApp Image 2026-07-09 at 13.40.26.jpeg,False,not_a_chest_xray,1.1294
+non_medical,WhatsApp Image 2026-07-10 at 22.00.18.jpeg,False,not_a_chest_xray,1.2213
+non_medical,WhatsApp Image 2026-07-10 at 22.01.01.jpeg,False,not_a_chest_xray,1.1391
+non_medical,WhatsApp Image 2026-07-10 at 22.01.47.jpeg,False,not_a_chest_xray,1.1752
+non_medical,WhatsApp Image 2026-07-10 at 22.04.23.jpeg,False,not_a_chest_xray,1.2207
+other_radiograph,1-rotated1-rotated3-rotated1 (2).jpg,False,outside_training_distribution,0.6906
+other_radiograph,10-rotated1-rotated2-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6534
+other_radiograph,10-rotated1-rotated3-rotated3 (1).jpg,False,outside_training_distribution,0.6304
+other_radiograph,10-rotated2-rotated3-rotated2.jpg,False,outside_training_distribution,0.665
+other_radiograph,10-rotated3-rotated2-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6544
+other_radiograph,10-rotated3-rotated2-rotated3.jpg,False,outside_training_distribution,0.6228
+other_radiograph,13-rotated1-rotated1-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6234
+other_radiograph,13-rotated1-rotated3.jpg,False,outside_training_distribution,0.6273
+other_radiograph,14-rotated2-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6585
+other_radiograph,15-rotated3-rotated2 (1).jpg,False,outside_training_distribution,0.6696
+other_radiograph,15-rotated3.jpg,False,outside_training_distribution,0.6948
+other_radiograph,16-rotated3-rotated2 (1).jpg,False,outside_training_distribution,0.7012
+other_radiograph,16-rotated3-rotated3-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6847
+other_radiograph,17-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.7071
+other_radiograph,18-rotated1-rotated3-rotated1.jpg,False,outside_training_distribution,0.6552
+other_radiograph,18-rotated2-rotated1-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6939
+other_radiograph,18-rotated2.jpg,False,outside_training_distribution,0.6956
+other_radiograph,19-rotated1-rotated2-rotated1-rotated1.jpg,False,outside_training_distribution,0.638
+other_radiograph,19-rotated1-rotated3 (1).jpg,False,outside_training_distribution,0.6803
+other_radiograph,19-rotated1-rotated3-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6771
+other_radiograph,2-rotated1-rotated1-rotated2-rotated1.jpg,False,outside_training_distribution,0.6424
+other_radiograph,2-rotated3 (1).jpg,False,outside_training_distribution,0.7346
+other_radiograph,20-rotated3-rotated3-rotated1-rotated1.jpg,False,outside_training_distribution,0.685
+other_radiograph,23-rotated2 (1).jpg,False,outside_training_distribution,0.6556
+other_radiograph,23.png,False,outside_training_distribution,0.7545
+other_radiograph,24-rotated2-rotated2-rotated1.jpg,False,outside_training_distribution,0.6826
+other_radiograph,24-rotated2-rotated3-rotated2-rotated1 (1).jpg,False,outside_training_distribution,0.645
+other_radiograph,25-rotated3-rotated2-rotated2-rotated1.jpg,False,outside_training_distribution,0.691
+other_radiograph,29-rotated1-rotated3-rotated1-rotated1.jpg,False,outside_training_distribution,0.6611
+other_radiograph,3-rotated1-rotated1-rotated2-rotated1.jpg,False,outside_training_distribution,0.6572
+other_radiograph,3-rotated2-rotated2-rotated3.jpg,False,outside_training_distribution,0.6485
+other_radiograph,3-rotated3-rotated2-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.6786
+other_radiograph,3-rotated3-rotated3-rotated2.jpg,False,outside_training_distribution,0.6423
+other_radiograph,3-rotated3.jpg,False,outside_training_distribution,0.6704
+other_radiograph,30-rotated1-rotated1-rotated1-rotated1.jpg,False,outside_training_distribution,0.6725
+other_radiograph,30-rotated2-rotated2-rotated2-rotated1.jpg,False,outside_training_distribution,0.6851
+other_radiograph,31-rotated1-rotated2.jpg,False,outside_training_distribution,0.6986
+other_radiograph,31-rotated2-rotated1-rotated3-rotated1.jpg,False,outside_training_distribution,0.6857
+other_radiograph,32 (1).jpg,False,outside_training_distribution,0.7514
+other_radiograph,32-rotated1-rotated1 (1).jpg,False,outside_training_distribution,0.7137
+other_radiograph,33-rotated3-rotated3-rotated2-rotated1.jpg,False,outside_training_distribution,0.7427
+other_radiograph,33-rotated3-rotated3-rotated2.jpg,False,outside_training_distribution,0.7345
+other_radiograph,37-rotated1-rotated1-rotated1.jpg,False,outside_training_distribution,0.6704
+other_radiograph,37-rotated2-rotated2-rotated2 (1).jpg,False,outside_training_distribution,0.664
+other_radiograph,37-rotated3-rotated3-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6621
+other_radiograph,38-rotated3-rotated2-rotated1 (1).jpg,False,outside_training_distribution,0.675
+other_radiograph,39-rotated1-rotated3-rotated2-rotated1.jpg,False,outside_training_distribution,0.7444
+other_radiograph,39-rotated1-rotated3-rotated3 (1).jpg,False,outside_training_distribution,0.734
+other_radiograph,39-rotated1-rotated3-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.7254
+other_radiograph,4-rotated1-rotated3-rotated2-rotated1 (2).jpg,False,outside_training_distribution,0.6945
+other_radiograph,4-rotated2-rotated1.jpg,False,outside_training_distribution,0.6806
+other_radiograph,42-rotated1-rotated2.jpg,False,outside_training_distribution,0.6608
+other_radiograph,43-rotated2-rotated3-rotated1-rotated1.jpg,False,outside_training_distribution,0.6611
+other_radiograph,45-rotated2-rotated2-rotated3 (1).jpg,False,outside_training_distribution,0.6913
+other_radiograph,46-rotated1-rotated1-rotated3-rotated1.jpg,False,outside_training_distribution,0.7055
+other_radiograph,46-rotated3-rotated1-rotated3 (1).jpg,False,outside_training_distribution,0.6534
+other_radiograph,48-rotated2-rotated2-rotated2-rotated1.jpg,False,outside_training_distribution,0.6773
+other_radiograph,49-rotated1-rotated1-rotated1.jpg,False,outside_training_distribution,0.69
+other_radiograph,49-rotated2-rotated2.jpg,False,outside_training_distribution,0.6838
+other_radiograph,5-rotated1-rotated1-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6837
+other_radiograph,5-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.7062
+other_radiograph,50-rotated3-rotated2-rotated2.jpg,False,outside_training_distribution,0.6421
+other_radiograph,50-rotated3.jpg,False,outside_training_distribution,0.6319
+other_radiograph,51-rotated1-rotated1-rotated1-rotated1.jpg,False,outside_training_distribution,0.6762
+other_radiograph,51-rotated1-rotated1-rotated1.jpg,False,outside_training_distribution,0.6483
+other_radiograph,57-rotated2-rotated1-rotated1.jpg,False,outside_training_distribution,0.6442
+other_radiograph,57-rotated3-rotated1-rotated3.jpg,False,outside_training_distribution,0.7126
+other_radiograph,57-rotated3-rotated2.jpg,False,outside_training_distribution,0.633
+other_radiograph,60-rotated2-rotated2-rotated1.jpg,False,outside_training_distribution,0.6864
+other_radiograph,61-rotated1-rotated2-rotated3-rotated1.jpg,False,outside_training_distribution,0.6603
+other_radiograph,62-rotated1-rotated2.jpg,False,outside_training_distribution,0.6282
+other_radiograph,62-rotated2-rotated3-rotated1-rotated1.jpg,False,outside_training_distribution,0.6791
+other_radiograph,68-rotated3-rotated2-rotated1 (2).jpg,False,outside_training_distribution,0.6502
+other_radiograph,70-rotated2.jpg,False,outside_training_distribution,0.6387
+other_radiograph,70-rotated3-rotated3-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6657
+other_radiograph,8-rotated2-rotated3-rotated3 (1).jpg,False,outside_training_distribution,0.706
+other_radiograph,8-rotated2.jpg,False,outside_training_distribution,0.7381
+other_radiograph,9-rotated1-rotated3-rotated1 (1).jpg,False,outside_training_distribution,0.6477
+other_radiograph,9-rotated3-rotated1-rotated2 (1).jpg,False,outside_training_distribution,0.6641
+other_radiograph,IMG0000194.jpg,False,outside_training_distribution,0.6884

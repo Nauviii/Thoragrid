@@ -1,15 +1,4 @@
-"""Agree/disagree feedback controls for a single interaction, shared by Chat and History.
-
-Agreement submits in one click. Disagreement asks which of a fixed set of reasons applied,
-also in one click: a bare disagreement records that something was wrong without recording
-what, and the three things that can go wrong here — a missed finding, a misplaced heatmap,
-a misjudged severity — need different fixes. Free text is offered only for the one reason
-that cannot be pre-categorised, since prose does not aggregate and radiologists reading a
-list of studies will not type it.
-
-The recorded verdict is read from the server rather than kept only in session state, so a
-reload or a second sign-in still shows what was already submitted.
-"""
+"""Agree/disagree feedback controls for a single interaction, shared by Chat and History."""
 
 import streamlit as st
 

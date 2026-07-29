@@ -1,26 +1,20 @@
-"""History page: browse past readings and open the full thread behind any of them.
-
-Rows are lazy. The thread behind a row is fetched only when that row is opened, because
-Streamlit executes the body of a collapsed expander just like an open one — the previous
-version therefore fetched every conversation, and re-signed every stored image, on every
-single page load. A reader scanning twenty rows paid for twenty threads to see none.
-
-The first page renders at once and the remainder fills in behind it, so a long record is
-readable immediately instead of after the whole list resolves.
-"""
+"""History page: browse past readings and open the full thread behind any of them."""
 
 import time
 
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from app import api_client
 from app.theme import condition_badge, image_mount, empty_state
 from app.components.zone_grid import zone_panel
 from app.components.feedback_control import render_feedback
 
-_FIRST_PAGE = 10     # rows shown before the reveal starts
-_BATCH = 4           # rows added per frame afterwards
-_BATCH_DELAY = 0.09  # seconds between frames
+_PAGE_SIZE = 10
 
 _VERDICT_MARK = {True: "agreed", False: "flagged"}
 
@@ -98,7 +92,7 @@ def _render_row(item: dict) -> None:
     with st.container(key=f"histrow_{item['id']}"):
         icon = ":material/expand_less:" if is_open else ":material/expand_more:"
         if st.button(_row_label(item), key=f"histbtn_{item['id']}", icon=icon,
-                     use_container_width=True):
+                     width="stretch"):
             st.session_state[open_key] = not is_open
             st.rerun()
 
@@ -125,13 +119,19 @@ def render() -> None:
     )
     st.markdown('<hr class="ma-divider">', unsafe_allow_html=True)
 
+    st.session_state.setdefault("history_shown", _PAGE_SIZE)
+
     try:
-        history = api_client.get_history(st.session_state.token)
+        history = api_client.get_history(
+            st.session_state.token, limit=st.session_state.history_shown, offset=0
+        )
     except api_client.ApiError as exc:
         st.error(str(exc))
         return
 
     items = history["items"]
+    total = history["total"]
+
     if not items:
         st.markdown(
             empty_state(
@@ -144,27 +144,17 @@ def render() -> None:
         return
 
     st.markdown(
-        f'<div class="ma-mono" style="margin-bottom:0.7rem">{history["total"]} '
-        f"interaction{'s' if history['total'] != 1 else ''} on record</div>",
+        f'<div class="ma-mono" style="margin-bottom:0.7rem">showing {len(items)} of {total} '
+        f"interaction{'s' if total != 1 else ''} on record</div>",
         unsafe_allow_html=True,
     )
 
-    for item in items[:_FIRST_PAGE]:
+    for item in items:
         _render_row(item)
 
-    rest = items[_FIRST_PAGE:]
-    if not rest:
-        return
-
-    # Pace the remainder on the first visit only. Re-animating on every expand would make
-    # opening a row near the bottom of a long record feel broken.
-    if st.session_state.get("history_revealed"):
-        for item in rest:
-            _render_row(item)
-        return
-
-    for start in range(0, len(rest), _BATCH):
-        for item in rest[start:start + _BATCH]:
-            _render_row(item)
-        time.sleep(_BATCH_DELAY)
-    st.session_state.history_revealed = True
+    remaining = total - len(items)
+    if remaining > 0:
+        label = f"Load {min(_PAGE_SIZE, remaining)} more"
+        if st.button(label, key="history_load_more", width="stretch"):
+            st.session_state.history_shown += _PAGE_SIZE
+            st.rerun()

@@ -90,6 +90,5 @@ def text_qa(
         interaction_id=interaction.id,
         conversation_id=resolved_conversation_id,
         answer=bundle["answer_output"]["answer"],
-        cross_specialty_notes=bundle["answer_output"]["cross_specialty_notes"],
         latency_ms=interaction.latency_ms,
     )

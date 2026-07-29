@@ -2,6 +2,7 @@
 
 from pinecone import Index
 
+from config.settings import settings
 from core.rag.retriever import retrieve_for_image_path, retrieve_for_text_path
 from core.llm.client import call_groq
 from core.llm.prompts import (
@@ -34,7 +35,6 @@ def run_image_llm_pipeline(
     semantic_context: str,
     index: Index,
     namespace: str,
-    score_threshold: float = 0.3,
 ) -> dict:
     """Run LLM Call 1, retrieval, cache check, and LLM Call 2; returns full bundle for audit logging.
 
@@ -52,12 +52,12 @@ def run_image_llm_pipeline(
     llm1_raw  = call_groq(LLM1_SYSTEM, llm1_user, schema=LLM1_SCHEMA, schema_name="rag_queries")
     llm1_out  = parse_llm1_output(llm1_raw)
 
-    rag_chunks = retrieve_for_image_path(
-        llm1_out["rag_queries"], index, namespace, score_threshold=score_threshold
-    )
+    rag_chunks = retrieve_for_image_path(llm1_out["rag_queries"], index, namespace)
 
     llm2_user = build_llm2_user_prompt(above_threshold, all_scores, semantic_context, rag_chunks)
-    llm2_raw  = call_groq(LLM2_SYSTEM, llm2_user, schema=LLM2_SCHEMA, schema_name="clinical_explanation")
+    llm2_raw  = call_groq(LLM2_SYSTEM, llm2_user, schema=LLM2_SCHEMA,
+                          schema_name="clinical_explanation",
+                          max_tokens=settings.llm2_max_tokens)
     llm2_out  = parse_llm2_output(llm2_raw)
 
     if not validate_llm2_output(llm2_out):
@@ -70,7 +70,6 @@ def run_image_llm_pipeline(
 
 REJECTED_QUERY_RESPONSE = {
     "answer": "Query rejected: input did not pass safety validation.",
-    "cross_specialty_notes": None,
 }
 
 
@@ -79,7 +78,6 @@ def run_text_llm_pipeline(
     index: Index,
     namespace: str,
     top_k: int = 4,
-    score_threshold: float = 0.3,
     prior_context: dict | None = None,
 ) -> dict:
     """Run guardrail check, retrieval, cache check, and LLM call; returns bundle for audit logging.
@@ -107,7 +105,7 @@ def run_text_llm_pipeline(
         if above:
             retrieval_query = f"{query} ({', '.join(above)})"
 
-    rag_chunks = retrieve_for_text_path(retrieval_query, index, namespace, top_k, score_threshold)
+    rag_chunks = retrieve_for_text_path(retrieval_query, index, namespace, top_k)
 
     user_prompt = build_text_qa_user_prompt(query, rag_chunks, prior_context)
     raw = call_groq(TEXT_QA_SYSTEM, user_prompt, schema=TEXT_QA_SCHEMA, schema_name="text_qa_answer")

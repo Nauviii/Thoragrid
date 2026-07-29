@@ -36,9 +36,16 @@ def test_distance_is_non_negative(result):
     assert result.distance >= 0.0
 
 
-def test_threshold_matches_calibrated_prototype(result, prototype):
-    """Returned threshold must equal the value calibrated in clip_prototype.json."""
-    assert result.threshold == round(prototype["threshold"], 4)
+def test_thresholds_come_from_settings_not_the_artifact(result):
+    """The operating point is configuration, not a property of the centroid.
+
+    The artifact still carries the mean + 1.5 sigma value it was calibrated with. That cut
+    refused 10.4% of genuine chest films when measured on held-out studies, so it is
+    deliberately ignored; reading it back here would re-couple retuning to recalibration.
+    """
+    assert result.warn_threshold == settings.clip_warn_threshold
+    assert result.reject_threshold == settings.clip_reject_threshold
+    assert result.warn_threshold < result.reject_threshold
 
 
 def test_centroid_dimension_matches_clip_embedding_size(prototype):
@@ -61,3 +68,29 @@ def test_layer2_fail_reason_mentions_distribution(result):
     """If Layer 1 passes but Layer 2 fails, reason must reference distribution mismatch."""
     if result.layer1_passed and not result.layer2_passed:
         assert "distribution" in result.reason
+
+def test_is_valid_covers_both_accepted_bands(result):
+    """A flagged study is accepted, not refused — that is the whole point of the middle band."""
+    if result.quality_flagged:
+        assert result.is_valid
+        assert result.layer2_passed
+        assert result.code == "quality_warning"
+
+
+def test_code_and_flag_agree(result):
+    """`code` and `quality_flagged` must never disagree; the UI branches on both."""
+    assert (result.code == "quality_warning") == result.quality_flagged
+
+
+def test_flag_band_matches_the_distance(result):
+    """The flag must follow from where the distance actually fell, not be set independently."""
+    if result.layer1_passed:
+        in_band = result.warn_threshold < result.distance <= result.reject_threshold
+        assert result.quality_flagged == in_band
+
+
+def test_refusal_requires_exceeding_the_reject_threshold(result):
+    """Layer 2 must only refuse past the reject boundary, never at the warn boundary."""
+    if result.layer1_passed and not result.layer2_passed:
+        assert result.distance > result.reject_threshold
+        assert result.code == "outside_training_distribution"
