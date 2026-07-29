@@ -5,8 +5,11 @@ import hashlib
 from pathlib import Path
 from transformers import AutoTokenizer
 
-# Load once at module level to avoid repeated disk I/O
-_TOKENIZER = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+from config.settings import settings
+
+
+# Loaded once at module level to avoid repeated disk I/O.
+_TOKENIZER = AutoTokenizer.from_pretrained(settings.rag_embedding_model)
 
 MAX_TOKENS = 200
 OVERLAP_TOKENS = 30
