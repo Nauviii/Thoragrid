@@ -10,12 +10,30 @@ import time
 
 import streamlit as st
 
+from app.components.result_chart import render_result_chart
+
 from app.theme import condition_badge, image_mount
 from app.components.zone_grid import zone_panel
 from app.components.confidence_chart import confidence_chart_html, low_confidence_narrative
 from app.components.feedback_control import render_feedback
 
-_REVEAL_WORDS = 3      # words per frame
+
+# Prose assembles on first render instead of landing as a block. The backend returns the
+# whole answer in one response — there is no token stream to follow — so this is pacing,
+# not real streaming: it does not shorten the wait before the first word, it only stops a
+# finished paragraph appearing all at once. Evidence (badges, images, zones) is never paced;
+# a reader waiting on a study should not wait on an animation to see it.
+#
+# Paced reveal has one cost that outweighs it on long answers. Streamlit appends each frame
+# to the end of the page, and the browser follows the growing content, so the viewport is
+# dragged downward for the whole animation and settles at the bottom of the answer. On a full
+# study — several findings, heat maps, a summary — that leaves the reader at the end of a
+# piece of writing they have not started, having to scroll back up to read it.
+#
+# Set to False, the answer lands whole and the page stays where the reader left it: on the
+# question they just asked, with the answer opening beneath it.
+_REVEAL_PACED = False
+_REVEAL_WORDS = 3      # words per frame, when paced
 _REVEAL_DELAY = 0.018  # seconds between frames
 
 
@@ -28,16 +46,18 @@ def _word_stream(text: str):
 
 
 def _reveal(text: str, key: str) -> None:
-    """Write prose, assembling it the first time and instantly on every rerun after.
+    """Write prose, pacing it on first render only when paced reveal is enabled.
 
-    Streamlit replays the whole thread on each interaction, so without the guard every
-    click would re-animate the entire conversation.
+    Streamlit replays the whole thread on each interaction, so the guard exists either way:
+    without it, every click would re-animate the entire conversation.
     """
     revealed = st.session_state.setdefault("revealed", set())
-    if key in revealed:
+    already = key in revealed
+    revealed.add(key)
+
+    if already or not _REVEAL_PACED:
         st.markdown(text)
         return
-    revealed.add(key)
     st.write_stream(_word_stream(text))
 
 
@@ -51,6 +71,32 @@ def render_user_upload(filename: str) -> None:
     """Render the record of a study the reader uploaded."""
     with st.chat_message("user"):
         st.markdown(f'<span class="ma-file">{filename}</span>', unsafe_allow_html=True)
+
+
+def render_assistant_record(answer: str, rows: list[dict], sql_executed: str | None,
+                            latency_ms: int | None = None,
+                            interaction_id: str | None = None) -> None:
+    """Render an answer drawn from the reading record: prose first, then the figures.
+
+    Prose leads because the question was asked in prose. The chart supports the sentence
+    rather than replacing it, and the SQL sits behind a disclosure so a reader who doubts a
+    number can see the query without every other reader having to look at one.
+    """
+    with st.chat_message("assistant"):
+        _reveal(answer, f"{interaction_id}:answer")
+        if rows:
+            render_result_chart(rows)
+            with st.expander(f"{len(rows)} row{'s' if len(rows) != 1 else ''}"):
+                st.dataframe(rows, width="stretch", hide_index=True)
+                # The generated SQL is shown to administrators only. A clinician asked a
+                # question in prose and is owed the figures, not the query; and the statement
+                # names the views and the scoping column, which is schema detail a reader has
+                # no use for and no reason to be handed.
+                if sql_executed and st.session_state.get("role") == "admin":
+                    st.markdown('<div class="ma-caption" style="margin-top:0.5rem">'
+                                "query executed</div>", unsafe_allow_html=True)
+                    st.code(sql_executed, language="sql", wrap_lines=True)
+        _render_latency({"latency_ms": latency_ms})
 
 
 def render_assistant_text(answer: str, latency_ms: int | None = None,
@@ -189,10 +235,22 @@ def render_analysis(result: dict) -> None:
                         unsafe_allow_html=True)
         st.markdown('<hr class="ma-divider">', unsafe_allow_html=True)
 
+        # The join is by exact condition name. The backend pulls the model's names back onto
+        # the CNN's before sending, so a miss here means normalisation itself failed — worth
+        # showing rather than rendering an explanation beside nothing, which is how this last
+        # went unnoticed.
         findings_by_condition = {f["condition"]: f for f in result["gradcam_findings"]}
         for condition_out in result["conditions"]:
             name = condition_out["name"]
-            _render_finding(condition_out, findings_by_condition.get(name),
+            finding = findings_by_condition.get(name)
+            if finding is None and findings_by_condition:
+                st.markdown(
+                    f'<div class="ma-caption" style="color:var(--caution)">'
+                    f"No heat map matched “{name}”. The written explanation below is shown "
+                    f"without its localisation.</div>",
+                    unsafe_allow_html=True,
+                )
+            _render_finding(condition_out, finding,
                             result["xray_url"], scores.get(name),
                             f"{result['interaction_id']}:{name}")
 

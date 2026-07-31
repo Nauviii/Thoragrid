@@ -57,6 +57,14 @@ class TextQAResponse(BaseModel):
     answer: str
     latency_ms: int
 
+    # Present only when the question was routed to the reading record. `rows` lets the client
+    # draw the figures beside the answer; `sql_executed` is what actually ran, so a reader who
+    # doubts a number can see the query rather than take it on trust.
+    route: str = "clinical"          # clinical | records
+    sql_executed: str | None = None
+    rows: list[dict] = []
+    row_count: int = 0
+
 
 class FeedbackResponse(BaseModel):
     """Response body for POST /feedback."""

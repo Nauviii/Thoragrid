@@ -28,6 +28,9 @@ def choose_chart(df: pd.DataFrame) -> tuple[str, dict] | None:
     if not numeric_cols:
         return None
 
+    # One row carrying one figure is a headline number. Checked before the two-column rule,
+    # because a bare aggregate like avg_confidence arrives as a single unlabelled column and
+    # would otherwise fall through to a one-cell table.
     if len(df) == 1 and len(numeric_cols) == 1:
         return "metric", {"label": label_cols[0] if label_cols else None,
                           "value": numeric_cols[0]}
@@ -35,6 +38,8 @@ def choose_chart(df: pd.DataFrame) -> tuple[str, dict] | None:
     if len(df.columns) < 2 or len(df) < _MIN_ROWS_FOR_CHART:
         return None
 
+    # A time column means the question was about change over time; a line reads that far
+    # better than bars, whatever else came back alongside it.
     if time_cols:
         return "line", {"x": time_cols[0], "y": numeric_cols[0]}
 
@@ -113,9 +118,22 @@ def _bar_chart(df: pd.DataFrame, label: str, value: str, horizontal: bool) -> al
     )
 
 
-def render_result_chart(df: pd.DataFrame) -> str | None:
-    """Draw the chart that fits this result; return the kind drawn, or None."""
+def render_result_chart(rows: "pd.DataFrame | list[dict]") -> str | None:
+    """Draw the chart that fits this result; return the kind drawn, or None.
+
+    Accepts either a frame or the raw row list an API response carries. The conversion lives
+    here rather than at each call site: rows arrive as JSON from the backend, and every caller
+    would otherwise repeat the same import and the same one-liner, with the same chance of
+    forgetting it.
+    """
     import streamlit as st
+
+    if not isinstance(rows, pd.DataFrame):
+        if not rows:
+            return None
+        df = pd.DataFrame(rows)
+    else:
+        df = rows
 
     choice = choose_chart(df)
     if choice is None:

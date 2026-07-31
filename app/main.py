@@ -162,15 +162,13 @@ def main() -> None:
         _sign_in_screen()
         return
 
-    from app.views import chat, history, sql_agent
+    from app.views import chat, history
 
     pages = {
         "chat": st.Page(chat.render, title="Chat", url_path="chat",
                         icon=":material/stethoscope:", default=True),
         "history": st.Page(history.render, title="History", url_path="history",
                            icon=":material/history:"),
-        "analytics": st.Page(sql_agent.render, title="Analytics", url_path="analytics",
-                             icon=":material/monitoring:"),
     }
     current = st.navigation(list(pages.values()), position="hidden")
 

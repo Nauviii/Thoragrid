@@ -11,6 +11,7 @@ from core.llm.prompts import (
     TEXT_QA_SYSTEM, TEXT_QA_SCHEMA, build_text_qa_user_prompt, parse_text_qa_output,
 )
 from core.llm.guardrails import (
+    normalise_condition_names,
     validate_llm2_output, validate_text_qa_output,
     check_prompt_injection, sanitize_user_input,
 )
@@ -59,6 +60,11 @@ def run_image_llm_pipeline(
                           schema_name="clinical_explanation",
                           max_tokens=settings.llm2_max_tokens)
     llm2_out  = parse_llm2_output(llm2_raw)
+    # The interface joins each explanation to its heat map by condition name, so the names the
+    # model returned are pulled back onto the ones the CNN reported before anything downstream
+    # depends on them. A slip here does not raise; it silently drops the evidence beside a
+    # finding, which is the failure least likely to be noticed.
+    llm2_out  = normalise_condition_names(llm2_out, above_threshold)
 
     if not validate_llm2_output(llm2_out):
         raise ValueError("LLM Call 2 output failed clinical safety validation")

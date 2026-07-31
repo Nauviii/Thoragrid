@@ -15,7 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from app import api_client
 from app.theme import empty_state
 from app.components.chat_bubble import (
-    render_user_text, render_user_upload, render_assistant_text, render_analysis,
+    render_user_text, render_user_upload, render_assistant_text,
+    render_assistant_record, render_analysis,
 )
 
 # Deterministic guidance per rejection reason. The backend already knows exactly why an
@@ -117,9 +118,15 @@ def _replay(turns: list[dict]) -> None:
         elif turn["kind"] == "user_upload":
             render_user_upload(turn["content"])
         elif turn["kind"] == "assistant_text":
-            render_assistant_text(
-                turn["answer"], turn.get("latency_ms"), turn.get("interaction_id"),
-            )
+            if turn.get("route") == "records":
+                render_assistant_record(
+                    turn["answer"], turn.get("rows", []), turn.get("sql_executed"),
+                    turn.get("latency_ms"), turn.get("interaction_id"),
+                )
+            else:
+                render_assistant_text(
+                    turn["answer"], turn.get("latency_ms"), turn.get("interaction_id"),
+                )
         elif turn["kind"] == "analysis":
             render_analysis(turn["result"])
         elif turn["kind"] == "upload_rejected":
@@ -193,5 +200,8 @@ def render() -> None:
             "interaction_id": result["interaction_id"],
             "answer": result["answer"],
             "latency_ms": result["latency_ms"],
+            "route": result.get("route", "clinical"),
+            "rows": result.get("rows", []),
+            "sql_executed": result.get("sql_executed"),
         })
         st.rerun()

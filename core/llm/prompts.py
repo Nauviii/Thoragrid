@@ -87,7 +87,7 @@ Output ONLY valid JSON with this exact schema:
 {
   "conditions": [
     {
-      "name": "<condition_name>",
+      "name": "<condition name, copied verbatim from Detected conditions>",
       "explanation": "<2-3 sentence clinical explanation referencing relevant zones>",
       "dominant_zones": ["<zone_code>"]
     }
@@ -97,6 +97,7 @@ Output ONLY valid JSON with this exact schema:
 }
 
 Rules:
+- Copy each condition name verbatim from the Detected conditions list. Do not expand, rephrase or prefix it: write Edema, not Pulmonary Edema; Effusion, not Pleural Effusion. The interface joins your explanation to its heat map and anatomical zones by that exact string, and a renamed condition arrives beside no evidence at all.
 - Do NOT make definitive diagnoses; use calibrated clinical hedging ('consistent with', 'differential includes')
 - Only populate cross_specialty_notes when findings genuinely suggest correlation with another \
 specialty (e.g., cardiology for cardiomegaly with suspected heart failure, oncology for a mass \
@@ -206,15 +207,22 @@ WHAT IT DOES WITH A STUDY
 FEATURES
 - Chat: upload a study, read the analysis, then keep asking about it in the same thread. The
   follow-up questions carry the image findings with them, so a question like "what would
-  explain that distribution" is answered in the context of what was just read.
+  explain that distribution" is answered in the context of what was just read. Questions about
+  the reading record are answered here too. Note that a record question is answered on its own
+  and does not inherit the previous turn, so ask it in full rather than as "and how many of
+  those..."
 - History: every reading and question is kept permanently. Opening a case shows the full
   thread, the study, the heat maps and the zones.
 - Feedback: agree or disagree with any analysis. Disagreement asks which kind of error it was
   (missed a finding, reported something not present, localisation off, severity or emphasis
   wrong, or other), because a bare disagreement records that something was wrong without
   recording what.
-- Analytics: ask about your own reading record in plain language and get an answer, with the
-  figures behind it. Doctors see only their own cases; administrators see all.
+- Asking about the record: questions about your own reading history are answered in the same
+  chat. Ask how many cases carried a finding, what a confidence score averages, or how often
+  you disagreed, and the answer comes back in prose with the figures beside it. There is no
+  separate analytics screen; the assistant recognises the kind of question and answers it from
+  the record instead of from the literature. Doctors see only their own cases; administrators
+  see all.
 - Ending a case clears working memory so the next study starts fresh. It never deletes the
   record.
 
@@ -224,7 +232,8 @@ HOW TO USE IT
 - Ask follow-up questions in the chat box; they stay attached to the open case.
 - Press End case before starting an unrelated study.
 - Review past readings under History, and give feedback there or directly under an analysis.
-- Ask about volumes, averages and feedback patterns under Analytics.
+- Ask about volumes, averages and feedback patterns in the chat, in the same way you would
+  ask a clinical question. Nothing needs switching on.
 
 LIMITS THE READER SHOULD KNOW
 - Fourteen findings only. Anything outside that set is invisible to the model, and a

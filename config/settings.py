@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     redis_url: str
     redis_cache_ttl_seconds: int = 2_592_000   # 30 days
     redis_session_ttl_seconds: int = 3_600       # 1 hour, sliding
-    kb_version: str = "v4"  
+    kb_version: str = "v7"  
 
     # CNN
     model_repo_id: str
